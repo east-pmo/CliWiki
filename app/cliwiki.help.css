@@ -1,0 +1,16 @@
+@charset "utf-8";
+
+/*
+ * cliwiki.help.css - CliWiki CSS style for help.
+ * http://cliwiki.codeplex.com/
+ *
+ * Copyright 2012 EAST Co.,Ltd.
+ * Licensed under the MIT license.
+ * http://cliwiki.codeplex.com/license
+ */
+
+body div#content section img.logo {
+	width: 1.5em;
+	height: 1.5em;
+	margin: 0 0.5em;
+}

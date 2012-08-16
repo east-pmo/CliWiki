@@ -1,0 +1,14 @@
+@charset "utf-8";
+
+/*
+ * compatibility.css - Generic style for backword compatibility.
+ * http://cliwiki.codeplex.com/
+ *
+ * Copyright 2012 EAST Co.,Ltd.
+ * Licensed under the MIT license.
+ * http://cliwiki.codeplex.com/license
+ */
+menu li {
+	list-style-type: none;
+	display: inline-block;
+}

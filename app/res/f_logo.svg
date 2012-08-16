@@ -1,0 +1,67 @@
+<?xml version="1.0" encoding="UTF-8" standalone="no"?>
+<!-- Created with Inkscape (http://www.inkscape.org/) -->
+
+<svg
+   xmlns:dc="http://purl.org/dc/elements/1.1/"
+   xmlns:cc="http://creativecommons.org/ns#"
+   xmlns:rdf="http://www.w3.org/1999/02/22-rdf-syntax-ns#"
+   xmlns:svg="http://www.w3.org/2000/svg"
+   xmlns="http://www.w3.org/2000/svg"
+   version="1.1"
+   width="175"
+   height="175"
+   id="svg3032">
+  <defs
+     id="defs3034">
+    <clipPath
+       id="clipPath2999">
+      <path
+         d="M 0,792 612,792 612,0 0,0 0,792 z"
+         id="path3001" />
+    </clipPath>
+  </defs>
+  <metadata
+     id="metadata3037">
+    <rdf:RDF>
+      <cc:Work
+         rdf:about="">
+        <dc:format>image/svg+xml</dc:format>
+        <dc:type
+           rdf:resource="http://purl.org/dc/dcmitype/StillImage" />
+        <dc:title></dc:title>
+      </cc:Work>
+    </rdf:RDF>
+  </metadata>
+  <g
+     transform="translate(-429.64286,-382.00504)"
+     id="layer1">
+    <g
+       transform="matrix(1.25,0,0,-1.25,133.39286,964.50504)"
+       id="g2995">
+      <g
+         clip-path="url(#clipPath2999)"
+         id="g2997">
+        <g
+           transform="translate(377,334)"
+           id="g3003">
+          <path
+             d="m 0,0 c 0,-4.398 -3.602,-8 -8,-8 l -124,0 c -4.398,0 -8,3.602 -8,8 l 0,124 c 0,4.398 3.602,8 8,8 l 124,0 c 4.398,0 8,-3.602 8,-8 L 0,0 z"
+             id="path3005"
+             style="fill:#3c5a98;fill-opacity:1;fill-rule:nonzero;stroke:none" />
+        </g>
+        <path
+           d="m 367,336 -120,0 0,20 120,0 0,-20 z"
+           id="path3007"
+           style="fill:#6d84b3;fill-opacity:1;fill-rule:nonzero;stroke:none" />
+        <g
+           transform="translate(317,336)"
+           id="g3009">
+          <path
+             d="m 0,0 0,51.469 -13.609,0 0,18.531 L 0,70 0,85.828 c 0,12.438 8.039,23.86 26.563,23.86 7.5,0 13.046,-0.719 13.046,-0.719 L 39.172,91.664 c 0,0 -5.656,0.055 -11.828,0.055 -6.68,0 -7.75,-3.078 -7.75,-8.188 l 0,-13.531 20.109,0 -0.875,-18.531 -19.234,0 L 19.594,0 0,0 z"
+             id="path3011"
+             style="fill:#ffffff;fill-opacity:1;fill-rule:nonzero;stroke:none" />
+        </g>
+      </g>
+    </g>
+  </g>
+</svg>

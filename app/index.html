@@ -1,0 +1,138 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE html>
+<html xmlns="http://www.w3.org/1999/xhtml" lang="ja" xml:lang="ja">
+<head>
+	<meta http-equiv="content-type" content="application/xhtml+xml" />
+	<meta http-equiv="content-language" content="ja" />
+	<meta name="application-name" content="CliWiki" />
+	<title>CliWiki - Stand alone client Wiki</title>
+	<link rel="stylesheet" type="text/css" href="compatibility.css" />
+	<link rel="stylesheet" type="text/css" href="cliwiki.css" />
+	<link rel="stylesheet" type="text/css" href="cliwiki.print.css" media="print "/>
+	<link rel="SHORTCUT ICON" href="icon_16.png" />
+	<script type="text/javascript" src="jquery-1.7.2.min.js"></script>
+	<script type="text/javascript" src="extension.String.js"></script>
+	<script type="text/javascript" src="extension.Date.js"></script>
+	<script type="text/javascript" src="Preference.js"></script>
+	<script type="text/javascript" src="CliWikiFormatter.js"></script>
+	<script type="text/javascript" src="WikiPageStocker.js"></script>
+	<script type="text/javascript" src="CliWikiUI.js"></script>
+	<script type="text/javascript" src="CliWiki.js"></script>
+</head>
+<body role="application">
+	<header id="pageHeader" role="banner">
+		<h1><img class="icon" src="./res/chestnut.svg" align="left" />
+			CliWiki - Stand alone client Wiki</h1>
+		<nav>
+			<ul id="globalMenu">
+				<li><a href="#" title="FrontPage">FrontPage</a></li>
+				<li><a id="pageListMenuItem" href="#">ページ一覧</a></li>
+				<li><a id="updateHistoryMenuItem" href="#">更新履歴</a></li>
+				<li><a href="help.ja.html" target="_blank">ヘルプ</a></li>
+			</ul>
+		</nav>
+	</header>
+	<div id="content">
+		<div id="row">
+			<aside id="sideBarMenu" role="complementary">
+				<nav role="navigation">
+					<h1>コンテンツ</h1>
+					<ul id="pageIndex">
+						<li>FrontPage</li>
+						<li>SandBox</li>
+					</ul>
+					<form><input type="text" id="wikiName" placeholder="ページ名" required="required" /><button type="button" id="showPageButton" disabled="disabled">&gt;&gt;</button></form>
+				</nav>
+				<nav>
+					<h1>最近の更新</h1>
+					<div id="recentUpdateContent">
+					</div>
+				</nav>
+			</aside>
+			<div id="sectionContainer">
+				<section id="page">
+					<article role="main">
+						<div id="container">
+							<menu type="toolbar">
+								<li><button type="button" id="editButton" class="presentation">編集</button></li>
+								<li><button type="button" id="cancelButton"  class="edit">取消</button></li>
+								<li><button type="button" id="updateButton"  class="edit">更新</button></li>
+							</menu>
+							<details id="source">
+								<summary><span>ソース - <span id="sourcePageName"></span><span></summary>
+								<h2>タイトル</h2>
+								<div><input type="text" id="sourceTitle" size="40"/></label></div>
+								<h2>本文</h2>
+								<textarea id="sourceContent" rows="20"></textarea>
+								<hr />
+							</details>
+							<div id="presentation">
+								<h1 id="presentationTitle">FrontPage</h1>
+								<div id="presentationContent">HTML</div>
+							</div>
+						</div>
+						<footer>
+							<p>更新日時: <time id="contentLastUpdateTime">-</time></p>
+						</footer>
+					</article>
+				</section>
+				<section id="pageList">
+					<h1>ページ一覧</h1>
+					<table id="pageListTable" class="pageInfo">
+						<thead>
+							<tr>
+								<th class="pageName">タイトル(ページ名)</th>
+								<th class="lastUpdateTime">最終更新日時</th>
+								<th class="updateCount">更新回数</th>
+							</tr>
+						</thead>
+						<tbody>
+							<tr>
+								<td>(FrontPage)FrontPage</td>
+								<td>2012-07-24T00:00:00+0900</td>
+								<td>0</td>
+							</tr>
+						</tbody>
+					</table>
+				</section>
+				<section id="updateHistory">
+					<h1>更新履歴</h1>
+					<table id="updateHistoryTable" class="pageInfo">
+						<thead>
+							<tr>
+								<th class="lastUpdateTime">最終更新日時</th>
+								<th class="pageName">タイトル(ページ名)</th>
+								<th class="updateCount">更新回数</th>
+							</tr>
+						</thead>
+						<tbody>
+							<tr>
+								<td>2012-07-24T00:00:00+0900</td>
+								<td>(FrontPage)FrontPage</td>
+								<td>0</td>
+							</tr>
+						</tbody>
+					</table>
+				</section>
+				<section id="pageUpdateHistory">
+					<h1>ページ更新履歴 - <span id="pageUpdateHistoryPageName"></span></h1>
+					<table class="historyInfo">
+						<thead>
+							<tr>
+								<th></th>
+								<th>更新日時 / タイトル</th>
+							</tr>
+						</thead>
+						<tbody id="pageUpdateHistoryList">
+						</tbody>
+					</table>
+				</section>
+			</div>
+		</div>
+	</div>
+	<footer id="pageFooter" role="contentInfo">
+		<p id="version">CliWiki Ver.0.01.005</p>
+		<p><a href="http://www.est.co.jp" target="_blank">EAST Co., Ltd.</a></p>
+	</footer>
+</body>
+</html>

@@ -1,0 +1,38 @@
+@charset "utf-8";
+
+/*
+ * cliwiki.print.css - CliWiki CSS style for print.
+ * http://cliwiki.codeplex.com/
+ *
+ * Copyright 2012 EAST Co.,Ltd.
+ * Licensed under the MIT license.
+ * http://cliwiki.codeplex.com/license
+ */
+
+@media print {
+	body {
+		font-size: 10pt;
+	}
+	menu {
+		display: none;
+	}
+
+	header#pageHeader {
+		display: none;
+	}
+	aside {
+		display: none;
+	}
+	footer#pageFooter {
+		display: none;
+	}
+
+	body div#content {
+		position: static;
+		top: 0em;
+		bottom: 0em;
+	}
+	body div#content div#row {
+		display: block;
+	}
+}

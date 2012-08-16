@@ -1,0 +1,305 @@
+@charset "utf-8";
+
+/*
+ * cliwiki.css - CliWiki common CSS style
+ * http://cliwiki.codeplex.com/
+ *
+ * Copyright 2012 EAST Co.,Ltd.
+ * Licensed under the MIT license.
+ * http://cliwiki.codeplex.com/license
+ */
+
+/*
+ * Common style
+ */
+header {
+	border-bottom: 1px solid black;
+}
+
+table {
+	border-collapse: collapse;
+}
+table tr {
+	border-left: 1px solid gray;
+	border-top: 1px solid gray;
+}
+table tr th, table tr td {
+	border-right: 1px solid gray;
+	border-bottom: 1px solid gray;
+	padding: 0.3em;
+}
+
+dl {
+	margin-left: 1em;
+	margin-right: 1em;
+}
+
+dl dt {
+	border-bottom: 1px solid mediumslateblue;
+}
+
+details summary {
+	cursor: pointer;
+}
+
+article footer {
+	border-top: 1px solid black;
+}
+footer p {
+	text-align: right;
+	margin: 0.5em;
+}
+
+body header h1 {
+	text-shadow: 2px 2px 2px #666;
+}
+
+body header ul {
+	display: block;
+}
+
+body header ul li {
+	display: inline;
+}
+
+/*
+ * Layout
+ */
+html, body {
+	height: 100%;
+}
+
+body {
+	margin: 0;
+	line-height: 1.5;
+}
+
+body header#pageHeader {
+	position: absolute;
+	margin: 0;
+	top: 0;
+	left: 0;
+	width: 100%;
+	height: 4em;
+	overflow-y: hidden;
+
+	background-color: lightskyblue;
+}
+
+body header#pageHeader h1 {
+	margin: 0.1em 0.5em;
+	line-height: 1;
+}
+body header#pageHeader h1 img.icon {
+	width: 1em;
+	height: 1em;
+	margin-right: 0.5em;
+}
+
+body header#pageHeader nav ul {
+	margin-top: 0;
+	margin-left: 0.5em;
+	margin-right: 0.5em;
+	text-align: right;
+}
+
+body div#content {
+	position: absolute;
+	top: 4em;
+	bottom: 3em;
+	width: 100%;
+	overflow-y: auto;
+
+	background-color: ivory;
+}
+
+body div#content div#row {
+	display: box;
+	display: -moz-box;
+	display: -webkit-box;
+	width: 100%;
+}
+
+body footer#pageFooter {
+	position: absolute;
+	margin: 0;
+	bottom: 0;
+	left: 0;
+	width: 100%;
+	height: 3em;
+	overflow-y: hidden;
+
+	background-color: lightskyblue;
+}
+
+/*
+ * @group sideBarMenu
+ */
+
+div#row aside#sideBarMenu {
+	background-color: ghostwhite;
+	margin: 0.5em;
+	padding: 0.5em;
+	width: 10em;
+	border-radius: 1em;
+	-moz-border-radius: 1em;
+	-webkit-border-radius: 1em;
+}
+
+div#row aside#sideBarMenu nav h1 {
+	margin-bottom: 0;
+	font-size: large;
+	text-shadow: 1px 1px 1px #666;
+}
+div#row aside#sideBarMenu nav h2 {
+	margin-top: 0.5em;
+	margin-left: 0.5em;
+	margin-bottom: 0;
+	font-size: medium;
+}
+
+div#row aside#sideBarMenu nav ul {
+	margin: 0;
+}
+
+div#row aside#sideBarMenu nav ul li a:not([href]) {
+	font-weight: bold;
+}
+
+div#row aside#sideBarMenu nav form {
+	display: box;
+	display: -moz-box;
+	display: -webkit-box;
+	width: 100%;
+	margin-top: 1em;
+}
+div#row aside#sideBarMenu nav form input {
+	display: block;
+	flex: 1;
+	-webkit-box-flex: 1;
+	-moz-box-flex: 1;
+}
+div#row aside#sideBarMenu nav form button {
+	display: block;
+}
+
+/*
+ * @group section
+ */
+div#row div#sectionContainer {
+	margin: 0.5em 0;
+	padding: 0em 1em;
+	flex: 1;
+	-webkit-box-flex: 1;
+	-moz-box-flex: 1;
+}
+
+div#row section h1 {
+	background-color: lavender;
+	padding: 0.2em;
+}
+div#row section h2 {
+	border-bottom: 0.1em solid mediumslateblue;
+	padding-bottom: 0.1em;
+}
+div#row section h3 {
+	border-left: 0.2em solid mediumslateblue;
+	padding-left: 0.2em;
+}
+
+div#row section pre {
+	background-color: lightcyan;
+	padding: 0.5em;
+	border-left: 0.5em solid lightcyan;
+	border-top: 1px solid lightcyan;
+	border-right: 1px solid lightcyan;
+	border-bottom: 1px solid lightcyan;
+}
+
+div#row section footer {
+	margin-top: 0.5em;
+}
+
+/* @end section */
+
+/*
+ * @group section#page
+ */
+div#row section article menu {
+	text-align: right;
+}
+
+details#source summary {
+	font-size: x-large;
+	font-weight:bold;
+	background-color: lightcyan;
+	padding: 0.2em;
+	width: 100%;
+	display: block;
+}
+details#source summary span {
+	border-bottom: 1px dotted grey;
+}
+
+details#source input, details#source textarea {
+	width: 100%;
+}
+/* @end section#page */
+
+/*
+ * @group section#pageList
+ */
+div#row section table.pageInfo {
+	width: 100%;
+}
+div#row section table.pageInfo tr {
+	border-top: 1px solid gray;
+	border-bottom: 1px solid gray;
+	border-left: none;
+}
+div#row section table.pageInfo th, div#row section table.pageInfo td {
+	border: none;
+}
+
+div#row section table.pageInfo th.lastUpdateTime, div#row section table.pageInfo td.lastUpdateTime  {
+	width: 12em;
+	text-align: center;
+}
+div#row section table.pageInfo th.updateCount, div#row section table.pageInfo td.updateCount  {
+	width: 5em;
+	text-align: center;
+}
+/* @end section#pageList */
+
+/*
+ * @group section#pageUpdateHistory
+ */
+
+div#row section table.historyInfo {
+	width: 100%;
+}
+
+div#row section table.historyInfo td.pageRevision {
+	width: 2em;
+	text-align: center;
+	font-weight: bold;
+}
+div#row section table.historyInfo td details summary span {
+	border-bottom: 1px dotted grey;
+}
+div#row section table.historyInfo td details div {
+	margin: 0.5em;
+	padding: 0 1em;
+	border-left: 1px dotted gray;
+}
+/* @end section#pageUpdateHistory */
+
+/*
+ * @group footer#pageFooter
+ */
+
+body footer#pageFooter p {
+	margin: 0 0.5em 0 0;
+}
+
+/* @end footer#pageFotter */
