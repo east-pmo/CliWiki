@@ -3,7 +3,7 @@
 	"name": "CliWiki",
 	"description": "__MSG_appDesc__",
 	"default_locale": "ja",
-	"version": "0.2.2.1",
+	"version": "0.2.2.2",
 	"app": {
 		"launch": {
 			"local_path": "index.html"
@@ -12,8 +12,5 @@
 	"icons": {
 		"16": "icon_16.png",
 		"128": "icon_128.png"
-	},
-	"permissions": [
-		"file://*/"
-	]
+	}
 }

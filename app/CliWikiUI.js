@@ -7,7 +7,7 @@
  * http://cliwiki.codeplex.com/license
  *
  * @author Osada Jun(EAST Co.,Ltd. - http://www.est.co.jp/)
- * @version 0.2.2.1(20120904)
+ * @version 0.2.2.2(20120904)
  */
 
 //
@@ -244,9 +244,16 @@ var CliWikiUI = {
 		globalMenu.find('li a#updateHistoryMenuItem').on('click', function() {
 			app.selectUpdateHistory();
 		});
-		globalMenu.find('li a#preferenceMenuItem').on('click', function() {
-			app.selectPreference();
-		});
+
+		var preferenceMenuItem = globalMenu.find('li#preferenceMenuItem');
+		if (Html5Feature.runningAsChromePackagedApps()) {
+			preferenceMenuItem.hide();
+		}
+		else {
+			preferenceMenuItem.children('a').on('click', function() {
+				app.selectPreference();
+			});
+		}
 	},
 
 	/**

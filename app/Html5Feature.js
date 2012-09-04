@@ -7,7 +7,7 @@
  * http://cliwiki.codeplex.com/license
  *
  * @author Osada Jun(EAST Co.,Ltd. - http://www.est.co.jp/)
- * @version 0.2.2.1(20120904)
+ * @version 0.2.2.2(20120904)
  */
 
 //
@@ -37,5 +37,15 @@ var Html5Feature = {
 		catch (e) {
 		}
 		return available;
+	},
+
+	/**
+	 * Check running as Google Chrome Packaged Apps.
+	 *
+	 * @return {Boolean} Result
+	 */
+	runningAsChromePackagedApps: function() {
+		return (typeof chrome !== 'undefined')
+				&& 0 <= window.location.href.indexOf('chrome-extension://');
 	}
 }

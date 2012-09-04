@@ -7,7 +7,7 @@
  * http://cliwiki.codeplex.com/license
  *
  * @author Osada Jun(EAST Co.,Ltd. - http://www.est.co.jp/)
- * @version 0.2.2.1(20120904)
+ * @version 0.2.2.2(20120904)
  */
 
 //
@@ -52,7 +52,7 @@ var Preference = {
 	 * @return {String} Application version.
 	 */
 	getAppVersion: function() {
-		return 'CliWiki Ver.0.2.2.1(20120904)';
+		return 'CliWiki Ver.0.2.2.2(20120904)';
 	},
 
 	/**
@@ -89,7 +89,8 @@ var Preference = {
 	 */
 	getAllowFileScheme: function() {
 		Preference._loadValues();
-		return Preference._values._allowFileScheme;
+		return Html5Feature.runningAsChromePackagedApps() === false
+				&& Preference._values._allowFileScheme;
 	},
 
 	/**
