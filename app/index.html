@@ -13,6 +13,7 @@
 	<script type="text/javascript" src="jquery-1.7.2.min.js"></script>
 	<script type="text/javascript" src="extension.String.js"></script>
 	<script type="text/javascript" src="extension.Date.js"></script>
+	<script type="text/javascript" src="Html5Feature.js"></script>
 	<script type="text/javascript" src="Preference.js"></script>
 	<script type="text/javascript" src="CliWikiFormatter.js"></script>
 	<script type="text/javascript" src="WikiPageStocker.js"></script>
@@ -25,10 +26,11 @@
 			CliWiki - Stand alone client Wiki</h1>
 		<nav>
 			<ul id="globalMenu">
-				<li><a href="#" title="FrontPage">FrontPage</a></li>
-				<li><a id="pageListMenuItem" href="#">ページ一覧</a></li>
-				<li><a id="updateHistoryMenuItem" href="#">更新履歴</a></li>
-				<li><a href="help.ja.html" target="_blank">ヘルプ</a></li>
+				<li><a href="#"><span lang="ja">FrontPage</span><span lang="en">FrontPage</span></a></li>
+				<li><a id="pageListMenuItem" href="#"><span lang="ja">ページ一覧</span><span lang="en">Page list</span></a></li>
+				<li><a id="updateHistoryMenuItem" href="#"><span lang="ja">更新履歴</span><span lang="en">Update history</span></a></li>
+				<li><a id="preferenceMenuItem" href="#"><span lang="ja">設定</span><span lang="en">Preference</span></a></li>
+				<li><a href="help.ja.html" target="_blank"><span lang="ja">ヘルプ</span><span lang="en">Help</span></a></li>
 			</ul>
 		</nav>
 	</header>
@@ -36,7 +38,7 @@
 		<div id="row">
 			<aside id="sideBarMenu" role="complementary">
 				<nav role="navigation">
-					<h1>コンテンツ</h1>
+					<h1><span lang="ja">コンテンツ</span><span lang="en">Contents</span></h1>
 					<ul id="pageIndex">
 						<li>FrontPage</li>
 						<li>SandBox</li>
@@ -44,7 +46,7 @@
 					<form><input type="text" id="wikiName" placeholder="ページ名" required="required" /><button type="button" id="showPageButton" disabled="disabled">&gt;&gt;</button></form>
 				</nav>
 				<nav>
-					<h1>最近の更新</h1>
+					<h1><span lang="ja">最近の更新</span><span lang="en">Recent updates</span></h1>
 					<div id="recentUpdateContent">
 					</div>
 				</nav>
@@ -59,10 +61,10 @@
 								<li><button type="button" id="updateButton"  class="edit">更新</button></li>
 							</menu>
 							<details id="source">
-								<summary><span>ソース - <span id="sourcePageName"></span><span></summary>
-								<h2>タイトル</h2>
+								<summary><span><span lang="ja">ソース</span><span lang="en">Source</span> - <span id="sourcePageName"></span></span></summary>
+								<h2><span lang="ja">タイトル</span><span lang="en">Title</span></h2>
 								<div><input type="text" id="sourceTitle" size="40"/></label></div>
-								<h2>本文</h2>
+								<h2><span lang="ja">本文</span><span lang="en">Contents</span></h2>
 								<textarea id="sourceContent" rows="20"></textarea>
 								<hr />
 							</details>
@@ -72,18 +74,27 @@
 							</div>
 						</div>
 						<footer>
-							<p>更新日時: <time id="contentLastUpdateTime">-</time></p>
+							<p><span lang="ja">更新日時</span><span lang="en">Update time</span>: <time id="contentLastUpdateTime">-</time></p>
 						</footer>
 					</article>
 				</section>
 				<section id="pageList">
-					<h1>ページ一覧</h1>
+					<h1><span lang="ja">ページ一覧</span><span lang="en">Page list</span></h1>
 					<table id="pageListTable" class="pageInfo">
 						<thead>
 							<tr>
-								<th class="pageName">タイトル(ページ名)</th>
-								<th class="lastUpdateTime">最終更新日時</th>
-								<th class="updateCount">更新回数</th>
+								<th class="pageName">
+									<span lang="ja">タイトル(ページ名)</span>
+									<span lang="en">Title(Page name)</span>
+								</th>
+								<th class="lastUpdateTime">
+									<span lang="ja">最終更新日時</span>
+									<span lang="en">Last update time</span>
+								</th>
+								<th class="updateCount">
+									<span lang="ja">更新回数</span>
+									<span lang="en">Count</span>
+								</th>
 							</tr>
 						</thead>
 						<tbody>
@@ -100,9 +111,19 @@
 					<table id="updateHistoryTable" class="pageInfo">
 						<thead>
 							<tr>
-								<th class="lastUpdateTime">最終更新日時</th>
-								<th class="pageName">タイトル(ページ名)</th>
-								<th class="updateCount">更新回数</th>
+							<tr>
+								<th class="lastUpdateTime">
+									<span lang="ja">最終更新日時</span>
+									<span lang="en">Last update time</span>
+								</th>
+								<th class="pageName">
+									<span lang="ja">タイトル(ページ名)</span>
+									<span lang="en">Title(Page name)</span>
+								</th>
+								<th class="updateCount">
+									<span lang="ja">更新回数</span>
+									<span lang="en">Count</span>
+								</th>
 							</tr>
 						</thead>
 						<tbody>
@@ -115,17 +136,33 @@
 					</table>
 				</section>
 				<section id="pageUpdateHistory">
-					<h1>ページ更新履歴 - <span id="pageUpdateHistoryPageName"></span></h1>
+					<h1>
+						<span lang="ja">ページ更新履歴</span>
+						<span lang="en">Page update history</span>
+						- <span id="pageUpdateHistoryPageName"></span>
+					</h1>
 					<table class="historyInfo">
 						<thead>
 							<tr>
 								<th></th>
-								<th>更新日時 / タイトル</th>
+								<th>
+									<span lang="ja">更新日時 / タイトル</span>
+									<span lang="en">Update time / Title</span>
+								</th>
 							</tr>
 						</thead>
 						<tbody id="pageUpdateHistoryList">
 						</tbody>
 					</table>
+				</section>
+				<section id="preference">
+					<h1><span lang="ja">設定</span><span lang="en">Preference</span></h1>
+					<form>
+						<fieldset>
+							<legend><span lang="ja">表示</span><span lang="en">Display</span></legend>
+							<label><input type="checkbox" id="allowFileScheme" name="allowFileScheme" value="1" /><span lang="ja">ローカルファイルへのリンクを有効にする。</span><span lang="en">Allow local file link.</span></label>
+						</fieldset>
+					</form>
 				</section>
 			</div>
 		</div>

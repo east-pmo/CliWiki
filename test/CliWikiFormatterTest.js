@@ -1,6 +1,11 @@
-/** 
+/**
  * @fileOverview Formatter test
- * 
+ * http://cliwiki.codeplex.com/
+ *
+ * Copyright 2012 EAST Co.,Ltd.
+ * Licensed under the MIT license.
+ * http://cliwiki.codeplex.com/license
+ *
  * @author Osada Jun(EAST Co.,Ltd. - http://www.est.co.jp/)
  * @version development
  */
@@ -232,7 +237,7 @@ TextFormatterTest.prototype = {
      * Test TextFormatter#format function.
      */
 	testFormat: function() {
-		var formatter = new TextFormatter();
+		var formatter = new TextFormatter(false);
 
 		var patterens = [
 			{ 'markUp' : ' http://nkjmkzk.net/?p=1618', 'translated' : '<a href=\'http://nkjmkzk.net/?p=1618\' target=\'_blank\'>http://nkjmkzk.net/?p=1618</a>' },
@@ -255,6 +260,24 @@ TextFormatterTest.prototype = {
 		this._checkTestPattern(formatter, patterens);
 	},
 
+	testFormatLink: function() {
+		var formatter = new TextFormatter(false);
+
+		var patterens = [
+			{ 'markUp' : '[[EAST|file://C/dummy.txt]]', 'translated' : '[[EAST|file://C/dummy.txt]]' },
+			{ 'markUp' : 'file://C/HTML5_Logo_128.png', 'translated' : 'file://C/HTML5_Logo_128.png' }
+		];
+		this._checkTestPattern(formatter, patterens);
+
+		formatter = new TextFormatter(true);
+
+		patterens = [
+			{ 'markUp' : ' [[EAST|file://C:/dummy.txt]]', 'translated' : '<a href=\'file://C:/dummy.txt\' target=\'_blank\'>EAST</a>' },
+			{ 'markUp' : 'file://C/HTML5_Logo_128.png', 'translated' : '<img src=\'file://C/HTML5_Logo_128.png\' alt=\'file://C/HTML5_Logo_128.png\' title=\'file://C/HTML5_Logo_128.png\'/>' }
+		];
+		this._checkTestPattern(formatter, patterens);
+	},
+	
 	//
 	// Private function
 	//

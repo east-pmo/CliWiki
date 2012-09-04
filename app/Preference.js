@@ -7,7 +7,7 @@
  * http://cliwiki.codeplex.com/license
  *
  * @author Osada Jun(EAST Co.,Ltd. - http://www.est.co.jp/)
- * @version 0.2.1.3(20120815)
+ * @version 0.2.2.1(20120904)
  */
 
 //
@@ -21,6 +21,28 @@
  */
 var Preference = {
 	//
+	// Private field
+	//
+
+	/**
+	 * Initialized flag.
+	 * @type Boolean
+	 */
+	_initialized: false,
+
+	/**
+	 * Preference values.
+	 * @type Object
+	 */
+	_values: {
+		/**
+		 * Allow file scheme flag.
+		 * @type Object
+		 */
+		_allowFileScheme: false
+	},
+
+	//
 	// Public function
 	//
 
@@ -30,7 +52,7 @@ var Preference = {
 	 * @return {String} Application version.
 	 */
 	getAppVersion: function() {
-		return 'CliWiki Ver.0.2.1.3(20120815)';
+		return 'CliWiki Ver.0.2.2.1(20120904)';
 	},
 
 	/**
@@ -58,5 +80,52 @@ var Preference = {
 	 */
 	getPreviewUpdateIntervalMs: function() {
 		return 100;
+	},
+
+	/**
+	 * Get allow file scheme.
+	 *
+	 * @return {Boolean} Allow file scheme flag.
+	 */
+	getAllowFileScheme: function() {
+		Preference._loadValues();
+		return Preference._values._allowFileScheme;
+	},
+
+	/**
+	 * Set allow file scheme.
+	 *
+	 * @param {Boolean} Allow file scheme flag.
+	 */
+	setAllowFileScheme: function(flag) {
+		Preference._values._allowFileScheme = flag;
+		Preference._saveValues();
+	},
+
+	//
+	// Private function
+	//
+
+	/**
+	 * Load saved preferenec values.
+	 */
+	_loadValues: function() {
+		if (Preference._initialized === false) {
+			var values = localStorage.getItem('CliWiki_Preference');
+			if (values !== null) {
+				Preference._values = JSON.parse(values);
+			}
+			Preference._initialized = true;
+		}
+	},
+
+	/**
+	 * Save preferenec values.
+	 */
+	_saveValues: function() {
+		if (Preference._initialized !== false
+		&& Html5Feature.isLocalStorageAvailable()) {
+			localStorage.setItem('CliWiki_Preference', JSON.stringify(Preference._values));
+		}
 	}
 }

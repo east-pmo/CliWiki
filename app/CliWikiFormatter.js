@@ -7,7 +7,7 @@
  * http://cliwiki.codeplex.com/license
  *
  * @author Osada Jun(EAST Co.,Ltd. - http://www.est.co.jp/)
- * @version 0.2.1.3(20120815)
+ * @version 0.2.2.1(20120904)
  */
 
 //
@@ -90,6 +90,30 @@ var FormatUtilities = {
 	},
 
 	/**
+     * Make XHTML element empty tag.
+     *
+     * @param {String} name element name.
+     * @param {Array} attributes element attributes.
+     * @return {String} XTHML element empty tag.
+     */
+	makeEmptyTag: function(name, attributes) {
+		var tag = '<' + name;
+		if (attributes !== undefined
+		&& attributes != null
+		&& 0 < attributes.length) {
+			for (var index = 0; index < attributes.length; index++) {
+				tag += ' '
+							+ FormatUtilities.escape(attributes[index].name)
+							+ '=\''
+							+ FormatUtilities.escape(attributes[index].value.toString())
+							+ '\'';
+			}
+		}
+		tag += '/>';
+		return tag;
+	},
+
+	/**
      * Make XHTML element end tag.
      *
      * @param {String} name element name.
@@ -143,10 +167,11 @@ HeadingFormatterCreator.prototype = {
 	/** 
 	 * Create formatter instance.
 	 * 
+	 * @param {Boolean} allowFileScheme Allow file shceme in link format.
 	 * @return {HeaddingFormatter} Formatter instance.
 	 */
-	createFormatter: function() {
-		return new HeadingFormatter();
+	createFormatter: function(allowFileScheme) {
+		return new HeadingFormatter(allowFileScheme);
 	}
 }
 
@@ -177,10 +202,11 @@ ListFormatterCreator.prototype = {
 	/** 
 	 * Create formatter instance.
 	 * 
+	 * @param {Boolean} allowFileScheme Allow file shceme in link format.
 	 * @return {ListFormatter} Formatter instance.
 	 */
-	createFormatter: function() {
-		return new ListFormatter();
+	createFormatter: function(allowFileScheme) {
+		return new ListFormatter(allowFileScheme);
 	}
 }
 
@@ -211,10 +237,11 @@ DefinitionListFormatterCreator.prototype = {
 	/** 
 	 * Create formatter instance.
 	 * 
+	 * @param {Boolean} allowFileScheme Allow file shceme in link format.
 	 * @return {DefinitionListFormatter} Formatter instance.
 	 */
-	createFormatter: function() {
-		return new DefinitionListFormatter();
+	createFormatter: function(allowFileScheme) {
+		return new DefinitionListFormatter(allowFileScheme);
 	}
 }
 
@@ -244,10 +271,11 @@ TableFormatterCreator.prototype = {
 	/** 
 	 * Create formatter instance.
 	 * 
+	 * @param {Boolean} allowFileScheme Allow file shceme in link format.
 	 * @return {TableFormatter} Formatter instance.
 	 */
-	createFormatter: function() {
-		return new TableFormatter();
+	createFormatter: function(allowFileScheme) {
+		return new TableFormatter(allowFileScheme);
 	}
 }
 
@@ -277,10 +305,11 @@ CommentFormatterCreator.prototype = {
 	/** 
 	 * Create formatter instance.
 	 * 
+	 * @param {Boolean} allowFileScheme Allow file shceme in link format.
 	 * @return {HeaddingFormatter} Formatter instance.
 	 */
-	createFormatter: function() {
-		return new CommentFormatter();
+	createFormatter: function(allowFileScheme) {
+		return new CommentFormatter(allowFileScheme);
 	}
 }
 
@@ -310,10 +339,11 @@ HorizontalRuleFormatterCreator.prototype = {
 	/** 
 	 * Create formatter instance.
 	 * 
+	 * @param {Boolean} allowFileScheme Allow file shceme in link format.
 	 * @return {HorizontalRuleFormatter} Formatter instance.
 	 */
-	createFormatter: function() {
-		return new HorizontalRuleFormatter();
+	createFormatter: function(allowFileScheme) {
+		return new HorizontalRuleFormatter(allowFileScheme);
 	}
 }
 
@@ -346,10 +376,11 @@ PreFormatterCreator.prototype = {
 	/** 
 	 * Create formatter instance.
 	 * 
+	 * @param {Boolean} allowFileScheme Allow file shceme in link format.
 	 * @return {PreFormatter} Formatter instance.
 	 */
-	createFormatter: function() {
-		return new PreFormatter();
+	createFormatter: function(allowFileScheme) {
+		return new PreFormatter(allowFileScheme);
 	}
 }
 
@@ -379,10 +410,11 @@ ParagraphFormatterCreator.prototype = {
 	/** 
 	 * Create formatter instance.
 	 * 
+	 * @param {Boolean} allowFileScheme Allow file shceme in link format.
 	 * @return {ParagraphFormatter} Formatter instance.
 	 */
-	createFormatter: function() {
-		return new ParagraphFormatter();
+	createFormatter: function(allowFileScheme) {
+		return new ParagraphFormatter(allowFileScheme);
 	}
 }
 
@@ -390,8 +422,9 @@ ParagraphFormatterCreator.prototype = {
  * TextFormatter
  * 
  * @class Text formatter
+ * @param {Boolean} allowFileScheme Allow file shceme in link format.
  */
-function TextFormatter() {
+function TextFormatter(allowFileScheme) {
     /**
      * Decoration patterns
      * @return {Array}
@@ -412,6 +445,13 @@ function TextFormatter() {
 		'.gif',
 		'.png'
 	];
+
+    /**
+     * Allof file scheme flag
+     * @return {Boolean}
+     */
+	this._allowFileScheme = (allowFileScheme !== undefined
+							&& allowFileScheme !== false);
 }
 TextFormatter.prototype = {
 	//
@@ -445,6 +485,17 @@ TextFormatter.prototype = {
 	//
 
 	/**
+	 * Get link url regular expression pattern.
+	 *
+	 * @return {Regex} Link url regular expression pattern.
+	 */
+	_getLinkUrlPattern: function() {
+		return this._allowFileScheme
+				? /(https?|file):/
+				: /https?:/;
+	},
+
+	/**
 	 * Split text to (internal) phrase
 	 *
 	 * @param {String} text Target text
@@ -455,7 +506,7 @@ TextFormatter.prototype = {
 		var phrases = new Array();
 		while (true) {
 			var processed = false;
-			var start = processText.search(/https?:/);
+			var start = processText.search(this._getLinkUrlPattern());
 			if (start === 0
 			|| (0 < start && processText.charAt(start - 1) === ' ')) {
 				var end = processText.indexOf(' ', start);
@@ -518,7 +569,7 @@ TextFormatter.prototype = {
 	 * @return {Boolean} True if phrase is outer link.
 	 */
 	_isOuterLink: function(phrase) {
-		return phrase.search(/^https?:/) === 0;
+		return phrase.search(this._getLinkUrlPattern()) === 0;
 	},
 
 	/**
@@ -541,7 +592,7 @@ TextFormatter.prototype = {
 		var startTag = FormatUtilities.makeStartTag('a', [
 			{ 'name': 'href', 'value': '#' },
 			{ 'name': 'class', 'value': 'wikiPage' },
-			{ 'name': 'title', 'value': wikiName },
+			{ 'name': 'title', 'value': wikiName }
 		]);
 		return startTag +  FormatUtilities.escape(literal) + '</a>';
 	},
@@ -595,7 +646,7 @@ TextFormatter.prototype = {
 			this._formatText(phrase.substring(0, start)),
 			FormatUtilities.isWikiName(link)
 				? this._makeWikiNameLinkElement(link, literal)
-				: this._makeLinkElement(link, literal),
+				: this._formatLinkUrl(link, literal),
 			this._formatText(phrase.substring(end + 2))
 		].join('');
 	},
@@ -647,16 +698,22 @@ TextFormatter.prototype = {
 	/** 
 	 * Format link url
 	 * 
-	 * @param {String} url Target url
-	 * @return {String} Formatted url
+	 * @param {String} url Target url.
+	 * @param {String} literal Literal.
+	 * @return {String} Formatted url.
 	 */
-	_formatLinkUrl: function(url) {
+	_formatLinkUrl: function(url, literal) {
 		var formatted = '';
 		if (this._isImageUrl(url)) {
-			formatted = '<img src="' + url + '" alt="' + FormatUtilities.escape(url) + '"/>';
+			var val = FormatUtilities.escape(literal);
+			formatted = FormatUtilities.makeEmptyTag('img', [
+				{ 'name': 'src', 'value': url },
+				{ 'name': 'alt', 'value': val },
+				{ 'name': 'title', 'value': val }
+			]);
 		}
 		else {
-			formatted = this._makeLinkElement(url, url);
+			formatted = this._makeLinkElement(url, literal);
 		}
 		return formatted;
 	},
@@ -672,9 +729,10 @@ TextFormatter.prototype = {
 		if (this._isWikiName(phrase)) {
 			formatted = this._makeWikiNameLinkElement(phrase, phrase);
 		}
-		else if (phrase.match(/^https?:\/\/.+$/)) {
+		else if ((this._allowFileScheme && phrase.match(/^(https?|file):\/\/.+$/))
+		|| (this._allowFileScheme === false && phrase.match(/^https?:\/\/.+$/))) {
 			// Auto link
-			formatted += this._formatLinkUrl(phrase);
+			formatted += this._formatLinkUrl(phrase, phrase);
 		}
 		else {
 			formatted = this._formatText(phrase);
@@ -687,8 +745,15 @@ TextFormatter.prototype = {
  * HeadingFormatter
  * 
  * @class Heading formatter
+ * @param {Boolean} allowFileScheme Allow file shceme in link format.
  */
-function HeadingFormatter() {
+function HeadingFormatter(allowFileScheme) {
+    /**
+     * Allof file scheme flag
+     * @return {Boolean}
+     */
+	this._allowFileScheme = (allowFileScheme !== undefined
+							&& allowFileScheme !== false);
 }
 HeadingFormatter.prototype = {
 	//
@@ -703,7 +768,7 @@ HeadingFormatter.prototype = {
 	 * @return {String} Formatted text
 	 */
 	format: function(lines, index) {
-		var textFormatter = new TextFormatter();
+		var textFormatter = new TextFormatter(this._allowFileScheme);
 
 		var line = lines[index];
 		var headingCount = FormatUtilities.countStartChar(line, '!');
@@ -721,13 +786,15 @@ HeadingFormatter.prototype = {
  * ListFormatter
  * 
  * @class List formatter
+ * @param {Boolean} allowFileScheme Allow file shceme in link format.
  */
-function ListFormatter() {
+function ListFormatter(allowFileScheme) {
     /**
      * Text formatter
      * @return {TextFormatter}
      */
-	this._formatter = new TextFormatter();
+	this._formatter = new TextFormatter(allowFileScheme !== undefined
+							&& allowFileScheme !== false);
 }
 ListFormatter.prototype = {
 	//
@@ -801,13 +868,15 @@ ListFormatter.prototype = {
  * DefinitionListFormatter
  * 
  * @class Definition list formatter
+ * @param {Boolean} allowFileScheme Allow file shceme in link format.
  */
-function DefinitionListFormatter() {
+function DefinitionListFormatter(allowFileScheme) {
     /**
      * Text formatter
      * @return {TextFormatter}
      */
-	this._formatter = new TextFormatter();
+	this._formatter = new TextFormatter(allowFileScheme !== undefined
+							&& allowFileScheme !== false);
 }
 DefinitionListFormatter.prototype = {
 	//
@@ -868,8 +937,9 @@ DefinitionListFormatter.prototype = {
  * TableFormatter
  * 
  * @class Table formatter
+ * @param {Boolean} allowFileScheme Allow file shceme in link format.
  */
-function TableFormatter() {
+function TableFormatter(allowFileScheme) {
     /**
      * Text formatter creator
      * @return {TableFormatterCreator}
@@ -880,7 +950,8 @@ function TableFormatter() {
      * Text formatter
      * @return {TextFormatter}
      */
-	this._textFormatter = new TextFormatter();
+	this._textFormatter = new TextFormatter(allowFileScheme !== undefined
+							&& allowFileScheme !== false);
 }
 TableFormatter.prototype = {
 	//
@@ -970,8 +1041,9 @@ TableFormatter.prototype = {
  * HorizontalRuleFormatter
  * 
  * @class Horizontal rule formatter
+ * @param {Boolean} allowFileScheme Allow file shceme in link format.
  */
-function HorizontalRuleFormatter() {
+function HorizontalRuleFormatter(allowFileScheme) {
 }
 HorizontalRuleFormatter.prototype = {
 	//
@@ -997,8 +1069,9 @@ HorizontalRuleFormatter.prototype = {
  * CommentFormatter
  * 
  * @class Comment formatter
+ * @param {Boolean} allowFileScheme Allow file shceme in link format.
  */
-function CommentFormatter() {
+function CommentFormatter(allowFileScheme) {
 }
 CommentFormatter.prototype = {
 	//
@@ -1024,8 +1097,15 @@ CommentFormatter.prototype = {
  * PreFormatter
  * 
  * @class Pre formatter
+ * @param {Boolean} allowFileScheme Allow file shceme in link format.
  */
-function PreFormatter() {
+function PreFormatter(allowFileScheme) {
+    /**
+     * Allof file scheme flag
+     * @return {Boolean}
+     */
+	this._allowFileScheme = (allowFileScheme !== undefined
+							&& allowFileScheme !== false);
 }
 PreFormatter.prototype = {
 	//
@@ -1040,7 +1120,7 @@ PreFormatter.prototype = {
 	 * @return {String} Formatted text
 	 */
 	format: function(lines, index) {
-		var textFormatter = new TextFormatter();
+		var textFormatter = new TextFormatter(this._allowFileScheme);
 		var creator = new PreFormatterCreator();
 
 		var formatted = '';
@@ -1080,8 +1160,15 @@ PreFormatter.prototype = {
  * PargraphFormatter
  * 
  * @class Paragraphg formatter
+ * @param {Boolean} allowFileScheme Allow file shceme in link format.
  */
-function ParagraphFormatter() {
+function ParagraphFormatter(allowFileScheme) {
+    /**
+     * Allof file scheme flag
+     * @return {Boolean}
+     */
+	this._allowFileScheme = (allowFileScheme !== undefined
+							&& allowFileScheme !== false);
 }
 ParagraphFormatter.prototype = {
 	//
@@ -1096,7 +1183,7 @@ ParagraphFormatter.prototype = {
 	 * @return {String} Formatted text
 	 */
 	format: function(lines, index) {
-		var textFormatter = new TextFormatter();
+		var textFormatter = new TextFormatter(this._allowFileScheme);
 
 		var formatted = '';
 		while (index < lines.length) {
@@ -1142,9 +1229,10 @@ CliWikiFormatter.prototype = {
 	 * Format contents
 	 * 
 	 * @param {String} contents CliWiki markuped text
+	 * @param {Boolean} allowFileScheme Allow file shceme in link format.
 	 * @return {String} Formatted text
 	 */
-	format: function(contents) {
+	format: function(contents, allowFileScheme) {
 		var formatted = '';
 
 		var lines = 0 <= contents.indexOf('\n')
@@ -1153,7 +1241,7 @@ CliWikiFormatter.prototype = {
 		var index = 0;
 		while (index < lines.length) {
 			if (0 < lines[index].length) {
-				var formatter = this._getFormatter(lines, index);
+				var formatter = this._getFormatter(lines, index, allowFileScheme);
 				if (formatter !== null) {
 					result = formatter.format(lines, index);
 					formatted += result.formatted;
@@ -1180,14 +1268,15 @@ CliWikiFormatter.prototype = {
 	 * 
 	 * @param {Array} lines Line array to format
 	 * @param {Number} lineIndex Target line index.
+	 * @param {Boolean} allowFileScheme Allow file shceme in link format.
 	 * @return {Formatter} Instance to format.
 	 */
-	_getFormatter: function(lines, lineIndex) {
+	_getFormatter: function(lines, lineIndex, allowFileScheme) {
 		var formatter = null;
 
 		for (var index = 0; index < this._creators.length; index++) {
 			if (this._creators[index].canCreate(lines, lineIndex)) {
-				formatter = this._creators[index].createFormatter();
+				formatter = this._creators[index].createFormatter(allowFileScheme);
 				break;
 			}
 		}

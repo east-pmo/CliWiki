@@ -192,10 +192,11 @@
 					<p>空行を指定すると段落が変わります。連続した行はひとつの段落とみなします。</p>
 					<h2> テキスト書式</h2>
 					<h3> 画像とWeb URL自動リンク</h3>
-					<p>次の条件に該当するURLにはリンクまたは画像として処理します。</p>
+					<p>次の条件に該当するURLはリンクまたは画像として処理します。</p>
 					<ol>
-						<li> 前後が空白または改行で区切られている。</li>
-						<li> 'http://'または'https://'ではじまる。</li>
+						<li>前後が空白または改行で区切られている。</li>
+						<li>'http://'または'https://'ではじまる。</li>
+						<li>設定で「ローカルファイルへのリンクを有効にする」をチェックしたとき、'file://'ではじまる。</li>
 					</ol>
 					<p>画像の場合は指定URLの画像を表示します。それ以外はリンクを設定します。</p>
 					<h3> 任意リンク</h3>
@@ -259,11 +260,17 @@
 				<section id="contactUs">
 					<h1>お問い合わせ</h1>
 					<p>CliWikiは<a href="http://www.est.co.jp" target="_blank">イースト株式会社</a>が作成・提供するHTML5アプリケーションです。</p>
-					<p>お問い合わせやご意見・ご感想は<a href="http://est.jp/html5/">est.jp - HTML5</a>からお願いします。</p>
-					<p><img class="logo" src="./res/f_logo.svg" align="left" /><a href="http://www.facebook.com/groups/HTML5east/" target="_blank">Facebookのhtml5eastグループ</a>でも受け付けます。</a></p>
+					<p>営業的なお問い合わせは<a href="http://est.jp/html5/">est.jp - HTML5</a>からお願いします。</p>
+					<p>技術的なお問い合わせやご意見・ご感想は<img class="logo" src="./res/f_logo.svg" align="left" /><a href="http://www.facebook.com/groups/HTML5east/" target="_blank">Facebookのhtml5eastグループ</a>でお聞かせいただければ幸いです。</p>
+					<h2>プロジェクト情報</h2>
+					<p>CliWikiは<a href="http://www.codeplex.com/" target="_blank">CodePlex</a>で<a href="http://cliwiki.codeplex.com/" target="_blank">オープンソースプロジェクトとして公開しています</a>。</p>
 				</section>
 				<section id="updateHistory">
 					<h1>最近の更新</h1>
+					<h2 id="0.2.2.1(20120904)">0.2.2.1(20120904)</h2>
+					<ul>
+						<li>設定によってローカルファイルへのリンクを可能とする機能を追加。</li>
+					</ul>
 					<h2 id="0.2.1.3(20120815)">0.2.1.3(20120815)</h2>
 					<ul>
 						<li>ページの更新履歴と指定バージョンの内容の表示機能追加。</li>

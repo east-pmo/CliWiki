@@ -7,7 +7,7 @@
  * http://cliwiki.codeplex.com/license
  *
  * @author Osada Jun(EAST Co.,Ltd. - http://www.est.co.jp/)
- * @version 0.2.1.3(20120815)
+ * @version 0.2.2.1(20120904)
  */
 
 //
@@ -17,7 +17,7 @@
 /** 
  * CliWikiFotterUI
  * 
- * @class CliWiki Fotter UI definitions static class
+ * @class CliWiki fotter UI definitions static class
  */
 var CliWikiFooterUI = {
 	//
@@ -31,7 +31,7 @@ var CliWikiFooterUI = {
      */
 	getAppVersionElement: function() {
 		return $('footer#pageFooter p#version');
-	},
+	}
 }
 
 /** 
@@ -154,6 +154,15 @@ var CliWikiUI = {
 	},
 
 	/**
+     * Get allow file scheme element.
+     * 
+     * @return {Object} Allow file scheme element.
+     */
+	getAllowFileSchemeElement: function() {
+		return $('section#preference input#allowFileScheme');
+	},
+
+	/**
      * Set up event handler
      *
      * @param {Object} app CliWikiApp instance.
@@ -176,6 +185,13 @@ var CliWikiUI = {
 		});
 
 		this._setUpPageHeaderEventHandler(app);
+	},
+
+    /**
+     * Change display language.
+     */
+	changeDisplayLanguage: function() {
+		$('body span[lang][lang!="' + Preference.getLanguage() + '"]').hide();
 	},
 
     /**
@@ -228,6 +244,9 @@ var CliWikiUI = {
 		globalMenu.find('li a#updateHistoryMenuItem').on('click', function() {
 			app.selectUpdateHistory();
 		});
+		globalMenu.find('li a#preferenceMenuItem').on('click', function() {
+			app.selectPreference();
+		});
 	},
 
 	/**
@@ -247,7 +266,6 @@ var CliWikiUI = {
 		});
 		
 		$('details#source summary').on('click', function() {
-		//	$(this).children(':not(summary)').toggle();
 			$(this).nextAll().toggle();
 		});
 	}

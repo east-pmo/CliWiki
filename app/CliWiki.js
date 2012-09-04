@@ -7,7 +7,7 @@
  * http://cliwiki.codeplex.com/license
  *
  * @author Osada Jun(EAST Co.,Ltd. - http://www.est.co.jp/)
- * @version 0.2.1.3(20120815)
+ * @version 0.2.2.1(20120904)
  */
 
 //
@@ -48,6 +48,7 @@ CliWikiApp.prototype = {
      */
 	init: function() {
 		CliWikiFooterUI.getAppVersionElement().text(Preference.getAppVersion());
+		CliWikiUI.changeDisplayLanguage();
 		CliWikiUI.hideEditor();
 
 		this._currentPageName = this._pageStocker.getFrontPageName();
@@ -156,7 +157,15 @@ CliWikiApp.prototype = {
 				'lastUpdateTime' : new Date().toISO8601String()
 			};
 
-			this.setPage(newPage);
+			var updated = true;
+			if (this._pageStocker.hasPage(pageName)) {
+				var curPage = this._pageStocker.getLatestPageContent(pageName);
+				updated = (curPage.content !== newPage.content);
+			}
+
+			if (updated) {
+				this.setPage(newPage);
+			}
 		}
 		else {
 			if (this._pageStocker.hasPage(pageName) === false) {
@@ -306,6 +315,7 @@ CliWikiApp.prototype = {
 		list.empty();
 		var archives = this._pageStocker.getPageContentArchives(pageName);
 		var revision = archives.length;
+		var instance = this;
 		jQuery.each(archives, function() {
 			var page = new Page(this.name, this.title, this.content, this.lastUpdateTime);
 			var row = $('<tr></tr>');
@@ -317,15 +327,32 @@ CliWikiApp.prototype = {
 						+ '</span></summary><div></div></details></td>');
 			row.find('details summary').on('click', function() {
 				var content = $(this).nextAll('div');
-				if (content.text().length === 0) {
-					content.html(new CliWikiFormatter().format(page.content));
-				}
-				else {
-					content.html('');
-				}
+				content.html(content.text().length === 0
+							? instance._format(page.content)
+							: '');
 			});
 			list.append(row);
 			--revision;
+		});
+	},
+
+    /**
+     * Select preference.
+     */
+	selectPreference: function() {
+		CliWikiUI.selectSection('preference');
+		this._currentPageName = '';
+		this._updateContentList();
+
+		var allowFileScheme = CliWikiUI.getAllowFileSchemeElement();
+		if (Preference.getAllowFileScheme()) {
+			allowFileScheme.attr('checked', 'checked');
+		}
+		else {
+			allowFileScheme.removeAttr('checked');
+		}
+		allowFileScheme.on('click', function() {
+			Preference.setAllowFileScheme(allowFileScheme.attr('checked') === 'checked');
 		});
 	},
 
@@ -355,6 +382,25 @@ CliWikiApp.prototype = {
 	//
 	// Pirvate method
 	//
+
+    /**
+     * Get formatter instance.
+     *
+     * @return {Object} Formatter instance.
+     */
+	_getFormatter: function() {
+		return new CliWikiFormatter();
+	},
+
+    /**
+     * Format page data to html.
+     *
+     * @param {String} pageContent Page content data.
+     * @return {String} Formatted html.
+     */
+	_format: function(pageContent) {
+		return this._getFormatter().format(pageContent, Preference.getAllowFileScheme());
+	},
 
     /**
      * Get latest content of current page
@@ -498,7 +544,7 @@ CliWikiApp.prototype = {
 		CliWikiUI.getPresentationTitleElement().text(page.title !== undefined && 0 < page.title.length ? page.title : page.name);
 
 		var content = CliWikiUI.getPresentationContentElement();
-		content.html(new CliWikiFormatter().format(page.content));
+		content.html(this._format(page.content));
 
 		if (asPreview === false) {
 			var instance = this;

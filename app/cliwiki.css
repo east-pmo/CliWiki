@@ -237,7 +237,7 @@ details#source summary {
 	width: 100%;
 	display: block;
 }
-details#source summary span {
+details#source summary > span {
 	border-bottom: 1px dotted grey;
 }
 

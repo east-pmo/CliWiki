@@ -1,6 +1,11 @@
-/** 
+/**
  * @fileOverview Extensiion function test
- * 
+ * http://cliwiki.codeplex.com/
+ *
+ * Copyright 2012 EAST Co.,Ltd.
+ * Licensed under the MIT license.
+ * http://cliwiki.codeplex.com/license
+ *
  * @author Osada Jun(EAST Co.,Ltd. - http://www.est.co.jp/)
  * @version development
  */
