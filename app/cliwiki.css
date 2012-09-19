@@ -38,6 +38,10 @@ dl dt {
 	border-bottom: 1px solid mediumslateblue;
 }
 
+span[lang!='en'] {
+	display: none;
+}
+
 details summary {
 	cursor: pointer;
 }
@@ -59,6 +63,10 @@ body header ul {
 }
 
 body header ul li {
+	display: inline;
+}
+
+body header ul li form {
 	display: inline;
 }
 

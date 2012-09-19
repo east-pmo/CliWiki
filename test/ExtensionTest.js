@@ -7,7 +7,7 @@
  * http://cliwiki.codeplex.com/license
  *
  * @author Osada Jun(EAST Co.,Ltd. - http://www.est.co.jp/)
- * @version development
+ * @version 0.3.1.1(20120919)
  */
 
 //
@@ -59,11 +59,30 @@ StringExtensionTest.prototype = {
 	//
 
     /**
+     * Test String#trim function.
+     */
+	testTrim: function() {
+		var testData = '    Who  killed the bambi?  ';
+		Assert.assert(testData.trim() === 'Who  killed the bambi?');
+		testData = testData.trim();
+		Assert.assert(testData.trim() === 'Who  killed the bambi?');
+	},
+
+    /**
      * Test String#addPrefixCharacter function.
      */
 	testAddPrefixCharacter: function() {
 		var testData = '22';
 		Assert.assert(testData.addPrefixCharacter('0', 3) === '022');
 		Assert.assert(testData.addPrefixCharacter('0', 2) === '22');
+	},
+
+    /**
+     * Test String#escapeRegExpMetaChar function.
+     */
+	testEscapeRegExpMetaChar: function() {
+		Assert.assert('['.escapeRegExpMetaChar() === '\\[');
+		Assert.assert('()'.escapeRegExpMetaChar() === '\\(\\)');
+		Assert.assert('\\(\\)'.escapeRegExpMetaChar() === '\\\\\\(\\\\\\)');
 	}
 }

@@ -7,7 +7,7 @@
  * http://cliwiki.codeplex.com/license
  *
  * @author Osada Jun(EAST Co.,Ltd. - http://www.est.co.jp/)
- * @version 0.2.2.2(20120904)
+ * @version 0.3.1.1(20120919)
  */
 
 //
@@ -36,6 +36,12 @@ var Preference = {
 	 */
 	_values: {
 		/**
+		 * Display language.
+		 * @type String
+		 */
+		_language: null,
+
+		/**
 		 * Allow file scheme flag.
 		 * @type Object
 		 */
@@ -52,7 +58,7 @@ var Preference = {
 	 * @return {String} Application version.
 	 */
 	getAppVersion: function() {
-		return 'CliWiki Ver.0.2.2.2(20120904)';
+		return 'CliWiki Ver.0.3.1.1(20120919)';
 	},
 
 	/**
@@ -61,7 +67,14 @@ var Preference = {
 	 * @return {String} Language.
 	 */
 	getLanguage: function() {
-		return 'ja';
+		Preference._loadValues();
+		var lang = Preference._values._language !== null
+					? Preference._values._language
+					: window.navigator.language;
+		if ((typeof lang == 'undefined') || lang === null || lang.length === 0) {
+			lang = 'en';
+		}
+		return lang;
 	},
 
 	/**
@@ -91,6 +104,16 @@ var Preference = {
 		Preference._loadValues();
 		return Html5Feature.runningAsChromePackagedApps() === false
 				&& Preference._values._allowFileScheme;
+	},
+
+	/**
+	 * Set display language.
+	 *
+	 * @param {String} Display language.
+	 */
+	setLanguage: function(lang) {
+		Preference._values._language = lang;
+		Preference._saveValues();
 	},
 
 	/**

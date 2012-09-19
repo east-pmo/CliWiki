@@ -7,8 +7,17 @@
  * http://cliwiki.codeplex.com/license
  *
  * @author Osada Jun(EAST Co.,Ltd. - http://www.est.co.jp/)
- * @version 0.2.1.3(20120815)
+ * @version 0.3.1.1(20120919)
  */
+
+/**
+ * Trim whitespace.
+ *
+ * @return {String} Trimed string.
+ */
+String.prototype.trim = function() {
+	return this.replace(/^ +| +$/g, '');
+}
 
 /**
  * Add prefix character.
@@ -24,4 +33,14 @@ String.prototype.addPrefixCharacter = function(prefixChar, maxLength) {
 	}
 	result += this;
 	return result.substring(result.length - maxLength);
+}
+
+/**
+ * Escape regular expression meta character.
+ *
+ * @return {String} Escaped string.
+ */
+String.prototype.escapeRegExpMetaChar = function() {
+	var metachars = /([\[\]\{\}\(\)\\\|\^\$\.\*\+\?])/g;
+	return this.replace(metachars, '\\$1');
 }

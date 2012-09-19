@@ -3,22 +3,23 @@
 <html xmlns="http://www.w3.org/1999/xhtml" lang="ja" xml:lang="ja">
 <head>
 	<meta http-equiv="content-type" content="application/xhtml+xml" />
-	<meta http-equiv="content-language" content="ja" />
 	<meta name="application-name" content="CliWiki" />
 	<title>CliWiki - Stand alone client Wiki</title>
 	<link rel="stylesheet" type="text/css" href="compatibility.css" />
 	<link rel="stylesheet" type="text/css" href="cliwiki.css" />
-	<link rel="stylesheet" type="text/css" href="cliwiki.print.css" media="print "/>
+	<link rel="stylesheet" type="text/css" href="cliwiki.print.css" media="print" />
 	<link rel="SHORTCUT ICON" href="icon_16.png" />
-	<script type="text/javascript" src="jquery-1.7.2.min.js"></script>
-	<script type="text/javascript" src="extension.String.js"></script>
-	<script type="text/javascript" src="extension.Date.js"></script>
-	<script type="text/javascript" src="Html5Feature.js"></script>
-	<script type="text/javascript" src="Preference.js"></script>
-	<script type="text/javascript" src="CliWikiFormatter.js"></script>
-	<script type="text/javascript" src="WikiPageStocker.js"></script>
-	<script type="text/javascript" src="CliWikiUI.js"></script>
-	<script type="text/javascript" src="CliWiki.js"></script>
+	<script src="jquery-1.7.2.min.js"></script>
+	<script src="extension.String.js"></script>
+	<script src="extension.Date.js"></script>
+	<script src="Html5Feature.js"></script>
+	<script src="Preference.js"></script>
+	<script src="TextCatalogue.js"></script>
+	<script src="CliWikiFormatter.js"></script>
+	<script src="WikiPageStocker.js"></script>
+	<script src="PageSearcher.js"></script>
+	<script src="CliWikiUI.js"></script>
+	<script src="CliWiki.js"></script>
 </head>
 <body role="application">
 	<header id="pageHeader" role="banner">
@@ -26,6 +27,7 @@
 			CliWiki - Stand alone client Wiki</h1>
 		<nav>
 			<ul id="globalMenu">
+				<li><form><input type="search" id="searchKeyword" placeholder="Keyword" title="Keyword" required="required"/><button type="button" id="searchButton" disabled="disabled"><span lang="ja">検索</span><span lang="en">Search</span></button></form></li>
 				<li><a href="#" title="FrontPage"><span lang="ja">FrontPage</span><span lang="en">FrontPage</span></a></li>
 				<li><a id="pageListMenuItem" href="#"><span lang="ja">ページ一覧</span><span lang="en">Page list</span></a></li>
 				<li><a id="updateHistoryMenuItem" href="#"><span lang="ja">更新履歴</span><span lang="en">Update history</span></a></li>
@@ -43,7 +45,7 @@
 						<li>FrontPage</li>
 						<li>SandBox</li>
 					</ul>
-					<form><input type="text" id="wikiName" placeholder="ページ名" required="required" /><button type="button" id="showPageButton" disabled="disabled">&gt;&gt;</button></form>
+					<form><input type="text" id="wikiName" placeholder="Page name" title="Page name" required="required" /><button type="button" id="showPageButton" disabled="disabled">&gt;&gt;</button></form>
 				</nav>
 				<nav>
 					<h1><span lang="ja">最近の更新</span><span lang="en">Recent updates</span></h1>
@@ -56,9 +58,9 @@
 					<article role="main">
 						<div id="container">
 							<menu type="toolbar">
-								<li><button type="button" id="editButton" class="presentation">編集</button></li>
-								<li><button type="button" id="cancelButton"  class="edit">取消</button></li>
-								<li><button type="button" id="updateButton"  class="edit">更新</button></li>
+								<li><button type="button" id="editButton" class="presentation"><span lang="ja">編集</span><span lang="en">Edit</span></button></li>
+								<li><button type="button" id="cancelButton"  class="edit"><span lang="ja">取消</span><span lang="en">Cancel</span></button></li>
+								<li><button type="button" id="updateButton"  class="edit"><span lang="ja">更新</span><span lang="en">Update</span></button></li>
 							</menu>
 							<details id="source">
 								<summary><span><span lang="ja">ソース</span><span lang="en">Source</span> - <span id="sourcePageName"></span></span></summary>
@@ -107,7 +109,7 @@
 					</table>
 				</section>
 				<section id="updateHistory">
-					<h1>更新履歴</h1>
+					<h1><span lang="ja">更新履歴</span><span lang="en">Update history</span></h1>
 					<table id="updateHistoryTable" class="pageInfo">
 						<thead>
 							<tr>
@@ -155,12 +157,58 @@
 						</tbody>
 					</table>
 				</section>
+				<section id="searchResult">
+					<h1>
+						<span lang="ja">検索結果</span>
+						<span lang="en">Search result</span>
+						- <span id="searchResultKeyword"></span>
+					</h1>
+					<p>
+						<div id="searchingMessage">
+							<span lang="ja">検索中……</span>
+							<span lang="en">Searching...</span>
+						</div>
+						<div id="foundMessage">
+							<span lang="ja"><span class="totalPages">n</span> ページ中 <span class="foundPages"></span> ページ見つかりました。</span>
+							<span lang="en">Found <span class="totalPages">n</span> page(s) in <span class="foundPages"></span> page(s).</span>
+						</div>
+						<div id="notFoundMessage">
+							<span lang="ja">見つかりませんでした。</span>
+							<span lang="en">Not found.</span>
+						</div>
+					</p>
+					<table id="searchResultTable" class="historyInfo">
+						<thead>
+							<tr>
+								<th>
+									<span lang="ja">タイトル / 内容</span>
+									<span lang="en">Title / Content</span>
+								</th>
+							</tr>
+						</thead>
+						<tbody id="searchResultList">
+							<tr>
+								<td>SandBox<br />Powershift</td>
+							</tr>
+						</tbody>
+					</table>
+				</section>
 				<section id="preference">
 					<h1><span lang="ja">設定</span><span lang="en">Preference</span></h1>
 					<form>
 						<fieldset>
 							<legend><span lang="ja">表示</span><span lang="en">Display</span></legend>
-							<label><input type="checkbox" id="allowFileScheme" name="allowFileScheme" value="1" /><span lang="ja">ローカルファイルへのリンクを有効にする。</span><span lang="en">Allow local file link.</span></label>
+
+							<p>
+								<label for="displayLanguage"><span lang="ja">言語</span><span lang="en">Language</span>:</label>
+								<select id="displayLanguage">
+									<option value="en">English</option>
+									<option value="ja">日本語</option>
+								</select>
+							</p>
+							<p id="allowFileSchemePreference">
+								<label><input type="checkbox" id="allowFileScheme" name="allowFileScheme" value="1" /><span lang="ja">ローカルファイルへのリンクを有効にする。</span><span lang="en">Allow local file link.</span></label>
+							</p>
 						</fieldset>
 					</form>
 				</section>

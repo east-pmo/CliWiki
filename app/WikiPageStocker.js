@@ -7,7 +7,7 @@
  * http://cliwiki.codeplex.com/license
  *
  * @author Osada Jun(EAST Co.,Ltd. - http://www.est.co.jp/)
- * @version 0.2.2.2(20120904)
+ * @version 0.3.1.1(20120919)
  */
 
 //
@@ -487,6 +487,24 @@ WikiPageStocker.prototype = {
 	},
 
 	/** 
+	 * Get initialize front page content data.
+	 *
+	 * @param {String} lang Language.
+	 */
+	_getInitFrontPageContent: function(lang) {
+		var content;
+		switch (lang) {
+			case 'ja':
+				content = 'CliWikiへようこそ。\n\nCliWiki(\'\'\'Cli\'\'\'ent \'\'\'Wiki\'\'\')はWikiを実現するHTML5アプリケーションです。ブラウザ単独で動作し、データをローカルに保存するため、インターネット接続を必要しません。サーバーやデータベースを用意することなく、またセットアップすることもなく、すぐに個人用Wikiとしてメモ帳代わりに利用することができます。会議の議事録メモや、ネット公開したくない日記などに最適です。\n\nまずは SandBox で編集を試してみてください。 \n\nhttp://www.w3.org/html/logo/downloads/HTML5_Logo_128.png\n\n\n技術的なお問い合わせやご意見・ご感想は[[Facebookのhtml5eastグループ|http://www.facebook.com/groups/HTML5east/]]でお聞かせいただければ幸いです。';
+				break;
+			default:
+				content = 'Welcome to [[CliWiki|https://chrome.google.com/webstore/detail/gegmobbadcnkafkpogenlobdjgiafppe]].\n\nCliWiki(\'\'\'Cli\'\'\'ent \'\'\'Wiki\'\'\') is a HTML5 application that acts as a Wiki. It works only a browser and store data to local storage. It should be no Internet connection. This is ideal for notes of meetings, diary, etc. that you do not want to expose to the Internet.\n\nFirst, please try editing in a sandbox.\n\nhttp://www.w3.org/html/logo/downloads/HTML5_Logo_128.png\n\nIf you have technical inquiries, opinions and impressions, please post comment to [[html5 east group in Facebook|http://www.facebook.com/groups/HTML5east/]].\n';
+				break;
+		}
+		return content;
+	},
+
+	/** 
 	 * Initialize default data.
 	 */
 	_initDefault: function() {
@@ -495,10 +513,11 @@ WikiPageStocker.prototype = {
 			'SandBox'
 		];
 
+		var lang = Preference.getLanguage();
 		this._pages = new Object();
 	 	this._pages['FrontPage'] = {
 			'title' : 'FrontPage',
-			'content' : 'CliWikiへようこそ。\n\nCliWiki(\'\'\'Cli\'\'\'ent \'\'\'Wiki\'\'\')はWikiを実現するHTML5アプリケーションです。ブラウザ単独で動作し、データをローカルに保存するため、インターネット接続を必要しません。サーバーやデータベースを用意することなく、またセットアップすることもなく、すぐに個人用Wikiとしてメモ帳代わりに利用することができます。会議の議事録メモや、ネット公開したくない日記などに最適です。\n\nまずは SandBox で編集を試してみてください。 \n\nhttp://www.w3.org/html/logo/downloads/HTML5_Logo_128.png\n\n\n技術的なお問い合わせやご意見・ご感想は[[Facebookのhtml5eastグループ|http://www.facebook.com/groups/HTML5east/]]でお聞かせいただければ幸いです。',
+			'content' : this._getInitFrontPageContent(lang),
 			'lastUpdateTime' : null
 		};
 	 	this._pages['SandBox'] = {

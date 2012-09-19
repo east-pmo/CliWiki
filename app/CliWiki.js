@@ -2,12 +2,12 @@
  * @fileOverview CliWiki application entry and class definitions
  * http://cliwiki.codeplex.com/
  *
- * Copyright 2012, EAST Co.,Ltd.
+ * Copyright 2012 EAST Co.,Ltd.
  * Licensed under the MIT license.
  * http://cliwiki.codeplex.com/license
  *
  * @author Osada Jun(EAST Co.,Ltd. - http://www.est.co.jp/)
- * @version 0.2.2.1(20120904)
+ * @version 0.3.1.1(20120919)
  */
 
 //
@@ -126,16 +126,17 @@ CliWikiApp.prototype = {
      * Cancel page edit.
      */
 	cancelEdit: function() {
-		var cancelEdit = this._pageStocker.hasPage(this._currentPageName);
-		var pageName = cancelEdit
+		var isUpdate = this._pageStocker.hasPage(this._currentPageName);
+		var pageName = isUpdate
 					? this._currentPageName
 					: this._pageStocker.getFrontPageName();
 		var page = this._pageStocker.getLatestPageContent(pageName);
 		page.name = pageName;
 
-		this.setPage(page);
+		this._setSource(page);
+		this._setPresentation(page, false);
 
-		if (cancelEdit === false) {
+		if (isUpdate === false) {
 			this._updateContentList();
 		}
 
@@ -160,7 +161,8 @@ CliWikiApp.prototype = {
 			var updated = true;
 			if (this._pageStocker.hasPage(pageName)) {
 				var curPage = this._pageStocker.getLatestPageContent(pageName);
-				updated = (curPage.content !== newPage.content);
+				updated = (curPage.title !==  newPage.title
+						|| curPage.content !== newPage.content);
 			}
 
 			if (updated) {
@@ -172,10 +174,13 @@ CliWikiApp.prototype = {
 				return;
 			}
 			if (pageName === this._pageStocker.getFrontPageName()) {
-				window.alert('FrontPageは削除できません。');
+				CliWikiUI.alert('FrontPage can\'t delete.');
 				return;
 			}
-			if (window.confirm('ページ"' + pageName + '"を削除しますか?') === false) {
+
+			var catalogue = new TextCatalogue(Preference.getLanguage());
+			if (CliWikiUI.confirm(pageName
+								  + catalogue.getText(': Do you want to delete this page?')) === false) {
 				return;
 			}
 
@@ -196,16 +201,16 @@ CliWikiApp.prototype = {
      * @param {Object} page Set page data.
      */
 	setPage: function(page) {
-		var setPage = page;
-		if (setPage !== undefined && setPage !== null) {
-			this._currentPageName = setPage.name;
-			this._pageStocker.storePage(setPage.name, setPage.title, setPage.content);
+		var updatedPage = page;
+		if (updatedPage !== undefined && updatedPage !== null) {
+			this._currentPageName = updatedPage.name;
+			this._pageStocker.storePage(updatedPage.name, updatedPage.title, updatedPage.content);
 		}
 		else {
-			setPage = this._getCurrentPageLatestContent();
+			updatedPage = this._getCurrentPageLatestContent();
 		}
-		this._setSource(setPage);
-		this._setPresentation(setPage, false);
+		this._setSource(updatedPage);
+		this._setPresentation(updatedPage, false);
 	},
 
     /**
@@ -237,9 +242,7 @@ CliWikiApp.prototype = {
      * Select page list.
      */
 	selectPageList: function() {
-		CliWikiUI.selectSection('pageList');
-		this._currentPageName = '';
-		this._updateContentList();
+		this._selectGlobalSection('pageList');
 
 		var instance = this;
 
@@ -247,11 +250,9 @@ CliWikiApp.prototype = {
 		tbody.empty();
 		jQuery.each(this._pageStocker.getPageInfoList(false), function() {
 			var updateCount = this.getUpdateCount();
-			var row = $('<tr><td><a href="#" title="' + this.name + '">'
-						 + this.title
-						 + '('
-						 + this.name
-						 + ')</a></td><td class="lastUpdateTime">'
+			var row = $('<tr><td>'
+						 + instance._makePageLinkElementString(this.name, this.title)
+						 + '</td><td class="lastUpdateTime">'
 						 + (this.lastUpdateTime !== null ? this.lastUpdateTime : '-')
 						 +'</td>'
 						 + instance._makePageUpdateCountCell(updateCount)
@@ -270,23 +271,19 @@ CliWikiApp.prototype = {
      * Select update history.
      */
 	selectUpdateHistory: function() {
-		CliWikiUI.selectSection('updateHistory');
-		this._currentPageName = '';
-		this._updateContentList();
+		this._selectGlobalSection('updateHistory');
 
 		var instance = this;
-		
+
 		var tbody = CliWikiUI.getUpdateHistoryTableBodyElement();
 		tbody.empty();
 		jQuery.each(this._pageStocker.getPageInfoList(true), function() {
 			var updateCount = this.getUpdateCount();
 			var row = $('<tr><td class="lastUpdateTime">'
 						 + (this.lastUpdateTime !== null ? this.lastUpdateTime : '-')
-						 +  '</td><td><a href="#" title="' + this.name + '">'
-						 + this.title
-						 + '('
-						 + this.name
-						 + ')</a></td>'
+						 +  '</td><td>'
+						 + instance._makePageLinkElementString(this.name, this.title)
+						 + '</td>'
 						 + instance._makePageUpdateCountCell(updateCount)
 						 + '</tr>');
 			if (0 < updateCount) {
@@ -306,9 +303,7 @@ CliWikiApp.prototype = {
      * @param {String} pageName Page name to show update history.
      */
 	selectPageUpdateHistory: function(pageName) {
-		CliWikiUI.selectSection('pageUpdateHistory');
-		this._currentPageName = '';
-		this._updateContentList();
+		this._selectGlobalSection('pageUpdateHistory');
 
 		CliWikiUI.getPageUpdateHistoryTitleElement().text(pageName);
 		var list = CliWikiUI.getPageUpdateHistoryListElement();
@@ -340,9 +335,7 @@ CliWikiApp.prototype = {
      * Select preference.
      */
 	selectPreference: function() {
-		CliWikiUI.selectSection('preference');
-		this._currentPageName = '';
-		this._updateContentList();
+		this._selectGlobalSection('preference');
 
 		var allowFileScheme = CliWikiUI.getAllowFileSchemeElement();
 		if (Preference.getAllowFileScheme()) {
@@ -353,6 +346,15 @@ CliWikiApp.prototype = {
 		}
 		allowFileScheme.on('click', function() {
 			Preference.setAllowFileScheme(allowFileScheme.attr('checked') === 'checked');
+		});
+
+		var lang = Preference.getLanguage();
+		var dispLang = CliWikiUI.getDisplayLanguageElement();
+		dispLang.val(lang);
+		dispLang.on('change', function() {
+			var changeLang = dispLang.children('option:selected').val();
+			Preference.setLanguage(changeLang);
+			CliWikiUI.changeDisplayLanguage();
 		});
 	},
 
@@ -375,8 +377,46 @@ CliWikiApp.prototype = {
 			};
 			this._setSource(newPage);
 			this._setPresentation(newPage, false);
+			CliWikiUI.selectSection('page');
 			this.startEdit();
 		}
+	},
+
+    /**
+     * Search pages.
+     *
+     * @param {String} keyword Search keyword.
+     */
+	search: function(keyword) {
+		CliWikiUI.getSearchResultTitleElement().text(keyword);
+		CliWikiUI.prepareSearch();
+		this._selectGlobalSection('searchResult');
+
+		var searcher = new PageSearcher(this._pageStocker);
+		var words = searcher.splitKeyword(keyword);
+		var hitPageInfo = searcher.search(words);
+
+		CliWikiUI.setSearchResult(this._pageStocker.getPageNameList().length, hitPageInfo.length);
+
+		var instance = this;
+		var tbody = CliWikiUI.getSearchResultListElement();
+		tbody.empty();
+		jQuery.each(hitPageInfo, function() {
+			var row = $('<tr></tr>');
+			var title = instance._emphasizeText(this.title, words);
+			var result = '<td>' + instance._makePageLinkElementString(this.name, title);
+			if (this.content !== null) {
+				result += '<br />' + instance._emphasizeText(this.content, words);
+			}
+			result += '</td>';
+
+			row.append(result);
+			tbody.append(row);
+		});
+
+		tbody.find('a[href!=""]').each(function() {
+			instance._setPageAnchorClickEvent($(this));
+		});
 	},
 
 	//
@@ -413,7 +453,20 @@ CliWikiApp.prototype = {
 		return page;
 	},
 
-    /**
+	/**
+     * Make page link element string.
+     *
+     * @param {String} name Page name.
+     * @param {String} title Page title.
+     * @return {String} Link element string.
+     */
+	_makePageLinkElementString: function(pageName, pageTitle) {
+		return '<a href="#" title="' + pageName + '">'
+				+ pageTitle
+				+ '(' + pageName  + ')</a>';
+	},
+
+	/**
      * Make side bar content list item.
      *
      * @param {String} name Page name.
@@ -444,6 +497,33 @@ CliWikiApp.prototype = {
 				   ? '<a href="#" class="pageUpdateHistory">' + updateCount + '</a>'
 				   : '-')
 				+ '</td>';
+	},
+
+    /**
+	 * Emphasize text.
+	 *
+	 * @param {String} text Text emphasize to.
+	 * @param {Array} words Emphasize target words.
+	 * @return {String} Emphasized text.
+     */
+	_emphasizeText: function(text, words) {
+		var emphasized = text;
+		for (var index = 0; index < words.length; index++) {
+			var re = new RegExp(words[index].escapeRegExpMetaChar(), 'g');
+			emphasized = emphasized.replace(re, '<strong>' + words[index] + '</strong>');
+		}
+		return emphasized;
+	},
+
+    /**
+	 * Select global section
+	 *
+	 * @param {String} sectionId Section element Id.
+     */
+	_selectGlobalSection: function(sectionId) {
+		CliWikiUI.selectSection(sectionId);
+		this._currentPageName = '';
+		this._updateContentList();
 	},
 
     /**
@@ -605,14 +685,14 @@ $(function() {
 	app.setUpEventHandler();
 
 	if (app.isStorageAvailable() === false) {
-		window.alert('申し訳ありません、ご利用の環境はページの保存に対応しておりません。ページを閉じると編集内容は失われます。');
+		CliWikiUI.alert('申し訳ありません、ご利用の環境はページの保存に対応しておりません。ページを閉じると編集内容は失われます。');
 		$('header#pageHeader h1').text($('header#pageHeader h1').text() + '(Trial)');
 	}
 	else {
 		var initMatch = '?init=localstorage';
 		var pos = window.location.href.indexOf(initMatch);
 		if (pos === (window.location.href.length - initMatch.length)) {
-			if (window.confirm('ローカルストレージを初期化しますか?')) {
+			if (CliWikiUI.confirm('Do you want to initialize the local storage?')) {
 				localStorage.clear();
 			}
 			window.location.replace(window.location.href.substring(0, pos));

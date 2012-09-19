@@ -7,7 +7,7 @@
  * http://cliwiki.codeplex.com/license
  *
  * @author Osada Jun(EAST Co.,Ltd. - http://www.est.co.jp/)
- * @version 0.2.2.2(20120904)
+ * @version 0.3.1.1(20120919)
  */
 
 //
@@ -154,12 +154,59 @@ var CliWikiUI = {
 	},
 
 	/**
+     * Get search result title element.
+     * 
+     * @return {Object} Search result title element.
+     */
+	getSearchResultTitleElement: function() {
+		return $('section#searchResult span#searchResultKeyword');
+	},
+
+	/**
+     * Get search result list element.
+     * 
+     * @return {Object} Search result list element.
+     */
+	getSearchResultListElement: function() {
+		return $('section#searchResult #searchResultList');
+	},
+
+	/**
+     * Get display language select element.
+     * 
+     * @return {Object} Display language select element.
+     */
+	getDisplayLanguageElement: function() {
+		return $('section#preference select#displayLanguage');
+	},
+
+	/**
      * Get allow file scheme element.
      * 
      * @return {Object} Allow file scheme element.
      */
 	getAllowFileSchemeElement: function() {
 		return $('section#preference input#allowFileScheme');
+	},
+
+	/**
+	 * Show alert message.
+     *
+     * @param {String} msg Alert message.
+     */
+	alert: function(msg) {
+		var catalogue = new TextCatalogue(Preference.getLanguage());
+		window.alert(catalogue.getText(msg));
+	},
+
+	/**
+	 * Show confirm message.
+     *
+     * @param {String} msg Confirm message.
+     */
+	confirm: function(msg) {
+		var catalogue = new TextCatalogue(Preference.getLanguage());
+		return window.confirm(catalogue.getText(msg));
 	},
 
 	/**
@@ -191,7 +238,15 @@ var CliWikiUI = {
      * Change display language.
      */
 	changeDisplayLanguage: function() {
-		$('body span[lang][lang!="' + Preference.getLanguage() + '"]').hide();
+		var lang = Preference.getLanguage();
+		$('body span[lang][lang!="' + lang + '"]').hide();
+		$('body span[lang][lang="' + lang + '"]').show();
+
+		var catalogue = new TextCatalogue(lang);
+		$('input[placeholder]').each(function() {
+			var elem = $(this);
+			elem.attr('placeholder', catalogue.getText(elem.attr('title')));
+		});
 	},
 
     /**
@@ -221,6 +276,39 @@ var CliWikiUI = {
 		$('#source').hide();
 	},
 
+	/**
+     * Prepare search.
+     */
+	prepareSearch: function() {
+		var section = $('section#searchResult');
+		section.find('div#searchingMessage').show();
+		section.find('div#foundMessage, div#notFoundMessage').hide();
+		section.find('table#searchResultTable').hide();
+	},
+
+	/**
+     * Set search result.
+     *
+     * @param {Number} totalPages Total page count.
+     * @param {Number} foundPages Found page count.
+     */
+	setSearchResult: function(totalPages, foundPages) {
+		var section = $('section#searchResult');
+		section.find('div#searchingMessage').hide();
+		if (foundPages === 0) {
+			section.find('div#foundMessage').hide();
+			section.find('div#notFoundMessage').show();
+		}
+		else {
+			section.find('div#foundMessage').show();
+			section.find('div#notFoundMessage').hide();
+			section.find('table#searchResultTable').show();
+
+			section.find('span.totalPages').text(totalPages);
+			section.find('span.foundPages').text(foundPages);
+		}
+	},
+
 	//
 	// Private function
 	//
@@ -232,6 +320,24 @@ var CliWikiUI = {
      */
 	_setUpPageHeaderEventHandler: function(app) {
 		var globalMenu = $('header#pageHeader ul#globalMenu');
+
+		var searchButton = globalMenu.find('form button#searchButton');
+		searchButton.on('click', function() {
+			var keyword = $('nav input#searchKeyword').val();
+			if (0 < keyword.length) {
+				app.search(keyword);
+			}
+		});
+		globalMenu.find('input#searchKeyword').on('keyup', function() {
+			var keyword = $(this).val();
+			if (0 < keyword.length) {
+				searchButton.removeAttr('disabled');
+			}
+			else {
+				searchButton.attr('disabled', 'disabled');
+			}
+		});
+
 		globalMenu.find('li a[title="FrontPage"]').on('click', function() {
 			var anchor = $(this);
 			if (anchor.attr('href') !== undefined) {
@@ -245,14 +351,11 @@ var CliWikiUI = {
 			app.selectUpdateHistory();
 		});
 
-		var preferenceMenuItem = globalMenu.find('li#preferenceMenuItem');
+		globalMenu.find('li#preferenceMenuItem a').on('click', function() {
+			app.selectPreference();
+		});
 		if (Html5Feature.runningAsChromePackagedApps()) {
-			preferenceMenuItem.hide();
-		}
-		else {
-			preferenceMenuItem.children('a').on('click', function() {
-				app.selectPreference();
-			});
+			$('p#allowFileSchemePreference').hide();
 		}
 	},
 

@@ -11,14 +11,14 @@
 	<link rel="stylesheet" type="text/css" href="cliwiki.print.css" media="print "/>
 	<link rel="stylesheet" type="text/css" href="cliwiki.help.css" />
 	<link rel="SHORTCUT ICON" href="icon_16.png" />
-	<script type="text/javascript" src="jquery-1.7.2.min.js"></script>
-	<script type="text/javascript" src="extension.String.js"></script>
-	<script type="text/javascript" src="extension.Date.js"></script>
-	<script type="text/javascript" src="Preference.js"></script>
-	<script type="text/javascript" src="CliWikiFormatter.js"></script>
-	<script type="text/javascript" src="WikiPageStocker.js"></script>
-	<script type="text/javascript" src="CliWikiUI.js"></script>
-	<script type="text/javascript" src="CliWikiHelp.js"></script>
+	<script src="jquery-1.7.2.min.js"></script>
+	<script src="extension.String.js"></script>
+	<script src="extension.Date.js"></script>
+	<script src="Preference.js"></script>
+	<script src="CliWikiFormatter.js"></script>
+	<script src="WikiPageStocker.js"></script>
+	<script src="CliWikiUI.js"></script>
+	<script src="CliWikiHelp.js"></script>
 </head>
 <body role="application">
 	<header id="pageHeader" role="banner">
@@ -87,6 +87,12 @@
 						<p>ページを削除するにはページの編集を開始した状態でテキスト入力エディターの内容をすべて削除して「更新」ボタンを選択してください。確認メッセージが表示されるので、「OK」ボタンを選択するとページが削除されます。</p>
 						<p><strong>注意: 削除したページの内容は取り戻せません。削除するときは慎重に確認してください。</strong></p>
 						<p>なおFrontPageは削除できません。</p>
+					</article>
+					<article>
+						<h2>検索</h2>
+						<p>グローバルメニューの「キーワード」入力フィールドにキーワードを入力して「検索」ボタンを選択するとページを検索します。<br />
+							検索するとき、アルファベットの大文字と小文字は区別します。<br />
+							検索キーワードは空白で区切ることで複数指定できます。複数指定したときはいずれかのキーワードを含むページを探します。空白を含む語句を検索したいときはダブルクオーテーション(&quot;)で検索語句を囲んでください。</p>
 					</article>
 				</section>
 				<section id="format">
@@ -225,7 +231,6 @@
 					</ul>
 					<h2> 優先度中くらい</h2>
 					<ul>
-						<li> 検索</li>
 						<li> データのインポート / エクスポート</li>
 					</ul>
 					<h2> 優先度低め</h2>
@@ -266,9 +271,14 @@
 				</section>
 				<section id="updateHistory">
 					<h1>最近の更新</h1>
+					<h2 id="0.3.1.1(20120919)">0.3.1.1(20120919)</h2>
+					<ul>
+						<li>検索機能を実装。</li>
+						<li>ユーザーインターフェースの英語切り替え機能を実装。</li>
+					</ul>
 					<h2 id="0.2.2.1(20120904)">0.2.2.1(20120904)</h2>
 					<ul>
-						<li>設定によってローカルファイルへのリンクを可能とする機能を追加。</li>
+						<li>設定によってローカルファイルへのリンクを可能とする機能を追加。<br />(本機能はChromeにインストールした場合Chrome側の制限により動作しないため無効とします)</li>
 					</ul>
 					<h2 id="0.2.1.3(20120815)">0.2.1.3(20120815)</h2>
 					<ul>

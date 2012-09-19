@@ -7,7 +7,7 @@
  * http://cliwiki.codeplex.com/license
  *
  * @author Osada Jun(EAST Co.,Ltd. - http://www.est.co.jp/)
- * @version development
+ * @version 0.3.1.1(20120919)
  */
 
 //
@@ -22,6 +22,8 @@ $(function() {
 		new FormatterCreatorTest(),
 		new TextFormatterTest(),
 		new ListFormatterTest(),
+		new TextCatalogueTest(),
+		new PageSearcherTest(),
 		new DateExtensionTest(),
 		new StringExtensionTest()
 	];
