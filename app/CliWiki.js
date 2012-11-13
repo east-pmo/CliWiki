@@ -7,16 +7,16 @@
  * http://cliwiki.codeplex.com/license
  *
  * @author Osada Jun(EAST Co.,Ltd. - http://www.est.co.jp/)
- * @version 0.3.1.1(20120919)
+ * @version 0.4.1.1(20121113)
  */
 
 //
 // Class definitions
 //
 
-/** 
+/**
  * CliWikiApp
- * 
+ *
  * @class CliWiki application
  */
 function CliWikiApp() {
@@ -245,7 +245,6 @@ CliWikiApp.prototype = {
 		this._selectGlobalSection('pageList');
 
 		var instance = this;
-
 		var tbody = CliWikiUI.getPageListTableBodyElement();
 		tbody.empty();
 		jQuery.each(this._pageStocker.getPageInfoList(false), function() {
@@ -253,8 +252,8 @@ CliWikiApp.prototype = {
 			var row = $('<tr><td>'
 						 + instance._makePageLinkElementString(this.name, this.title)
 						 + '</td><td class="lastUpdateTime">'
-						 + (this.lastUpdateTime !== null ? this.lastUpdateTime : '-')
-						 +'</td>'
+						 + this.getLastUpdateTime()
+						 + '</td>'
 						 + instance._makePageUpdateCountCell(updateCount)
 						 + '</tr>');
 			if (0 < updateCount) {
@@ -280,7 +279,7 @@ CliWikiApp.prototype = {
 		jQuery.each(this._pageStocker.getPageInfoList(true), function() {
 			var updateCount = this.getUpdateCount();
 			var row = $('<tr><td class="lastUpdateTime">'
-						 + (this.lastUpdateTime !== null ? this.lastUpdateTime : '-')
+						 + this.getLastUpdateTime()
 						 +  '</td><td>'
 						 + instance._makePageLinkElementString(this.name, this.title)
 						 + '</td>'
@@ -312,22 +311,72 @@ CliWikiApp.prototype = {
 		var revision = archives.length;
 		var instance = this;
 		jQuery.each(archives, function() {
-			var page = new Page(this.name, this.title, this.content, this.lastUpdateTime);
+			var page = new Page(pageName, this.title, this.content, this.lastUpdateTime);
 			var row = $('<tr></tr>');
 			row.append('<td class="pageRevision">' + revision + '</td>');
-			row.append('<td><details><summary><span>'
-						+ (page.lastUpdateTime !== null ? page.lastUpdateTime : '-')
-					    + ' / '
-					    + page.getTitle()
-						+ '</span></summary><div></div></details></td>');
-			row.find('details summary').on('click', function() {
-				var content = $(this).nextAll('div');
-				content.html(content.text().length === 0
-							? instance._format(page.content)
-							: '');
-			});
+
+			var heading = page.getLastUpdateTime() + ' / ' + page.getTitle();
+			if (revision === archives.length) {
+				row.append('<td><a href="#">' + heading + '</a></td>');
+				row.find('a').on('click', function() {
+					instance.selectPage(pageName);
+				});
+			}
+			else {
+				row.append('<td><details><summary><span>'
+							+ heading
+							+ '</span></summary><div></div></details></td>');
+				row.find('details summary').on('click', function() {
+					var content = $(this).nextAll('div');
+					if (content.text().length === 0) {
+						content.html(instance._format(page.content));
+						content.show();
+					}
+					else {
+						content.text('');
+						content.hide();
+					}
+				});
+			}
+			var operation = $('<td></td>');
+			operation.append(instance._makeComparisonElement(pageName, archives.length, revision));
+			row.append(operation);
 			list.append(row);
 			--revision;
+		});
+	},
+
+	/**
+	 * Select difference comparison of page.
+	 *
+	 * @param {String} pageName Target page name.
+	 * @param {Number} targetRevision Target revision to comparison.
+	 * @param {Number} selectedRevision Selected revision to comparison.
+	 */
+	selectDifferenceComparison: function(pageName, targetRevision, selectedRevision) {
+		this._selectGlobalSection('pageDifference');
+
+		CliWikiUI.getPageDifferenceTitleElement().text(pageName);
+
+		var comparison = this._getComparisonPage(pageName, targetRevision, selectedRevision);
+		var fromPage = comparison.fromPage;
+		var toPage = comparison.toPage;
+
+		CliWikiUI.setPageDifferenceHeaderInfo(comparison.fromRev,
+											  fromPage,
+											  comparison.toRev,
+											  toPage);
+
+		var diffSeq = new DiffExtractor().extract(fromPage.content.split('\n'),
+												  toPage.content.split('\n'));
+		this._buildPageDifferenceSequence(diffSeq);
+
+		var instance = this;
+		CliWikiUI.getPageDifferenceViewLatestElement().on('click', function() {
+			instance.selectPage(pageName);
+		});
+		CliWikiUI.getPageDifferenceViewUpdateHistoryElement().on('click', function() {
+			instance.selectPageUpdateHistory(pageName);
 		});
 	},
 
@@ -454,6 +503,95 @@ CliWikiApp.prototype = {
 	},
 
 	/**
+	 * Get page history data to comparison.
+	 *
+	 * @param {String} pageName Page name.
+	 * @param {Number} targetRevision Target revision to comparison.
+	 * @param {Number} selectedRevision Selected revision to comparison.
+	 * @return {Object} Page history datas to comparison.
+	 */
+	_getComparisonPage: function(pageName, targetRevision, selectedRevision) {
+		var fromRev = targetRevision;
+		var toRev = selectedRevision;
+		if (toRev < fromRev) {
+			fromRev = selectedRevision;
+			toRev = targetRevision;
+		}
+		var fromPage = this._pageStocker.getPageContentOfSpecifiedRevision(pageName, fromRev);
+		var toPage = this._pageStocker.getPageContentOfSpecifiedRevision(pageName, toRev);
+		return {
+			'fromRev': fromRev,
+			'fromPage': fromPage,
+			'toRev': toRev,
+			'toPage': toPage
+		};
+	},
+
+	/**
+	 * Make select element for difference comparison.
+	 *
+	 * @param {String} pageName Page name.
+	 * @param {Number} historyCount Count of page history.
+	 * @param {Number} revision Revision of page history.
+	 * @return {Object} Select jQuery object for difference comparison.
+	 */
+	_makeComparisonElement: function(pageName, historyCount, revision) {
+		var selector = $('<select></select>');
+		for (var index = historyCount; 0 < index; index--) {
+			var option = $('<option></option>');
+			if (index === revision) {
+				var catalogue = new TextCatalogue(Preference.getLanguage());
+				option.text(catalogue.getText('Comparison...'));
+				option.attr('selected', 'selected');
+			}
+			else {
+				option.text(index);
+			}
+			selector.append(option);
+		}
+
+		var instance = this;
+		selector.on('change', function() {
+			instance.selectDifferenceComparison(pageName, parseInt(revision), parseInt(selector.find(':selected').text()));
+		});
+		return selector;
+	},
+
+	/**
+	 * Make page difference sequence element.
+	 *
+	 * @param {Object} seq Difference sequence.
+	 * @return {Object} Difference element.
+	 */
+	_makeDiffSeqElement: function(seq) {
+		var diffClass;
+		if (seq.part === DiffPartType.SHARE) {
+			diffClass = 'diffShare';
+		}
+		else if (seq.part === DiffPartType.FROM) {
+			diffClass = 'diffFrom';
+		}
+		else if (seq.part === DiffPartType.TO) {
+			diffClass = 'diffTo';
+		}
+
+		var div = $('<div></div>');
+		div.addClass(diffClass);
+		if (seq.sequences.length === 1 && seq.sequences[0].length === 0) {
+			div.addClass('emptyDiffSequence');
+		}
+		else {
+			for (var index = 0; index < seq.sequences.length; index++) {
+				if (0 < index) {
+					div.append('<br />');
+				}
+				div.append(seq.sequences[index]);
+			}
+		}
+		return div;
+	},
+
+	/**
      * Make page link element string.
      *
      * @param {String} name Page name.
@@ -499,7 +637,63 @@ CliWikiApp.prototype = {
 				+ '</td>';
 	},
 
-    /**
+	/**
+	 * Build page difference sequence elements.
+	 *
+	 * @param {Object} diffSeq Page difference sequence.
+     */
+	_buildPageDifferenceSequence: function(diffSeq) {
+		var tbody = CliWikiUI.getPageDifferenceSequenceElement();
+		tbody.empty();
+		var index = 0;
+		while (index < diffSeq.length) {
+			var seq = diffSeq[index];
+			var row = $('<tr></tr>');
+			var column = $('<td></td>');
+			if (seq.part === DiffPartType.SHARE) {
+				var diff = this._makeDiffSeqElement(seq);
+				if (0 < diff.length) {
+					column.attr('colspan', 2);
+					column.append(diff);
+					row.append(column);
+				}
+			}
+			else if (seq.part === DiffPartType.FROM) {
+				var diff = this._makeDiffSeqElement(seq);
+				if (0 < diff.length) {
+					column.append(diff);
+					row.append(column);
+					if (index + 1 < diffSeq.length
+					&& diffSeq[index + 1].part === DiffPartType.TO) {
+						++index;
+						diff = this._makeDiffSeqElement(diffSeq[index]);
+						if (0 < diff.length) {
+							column = $('<td></td>');
+							column.append(diff);
+							row.append(column);
+						}
+					}
+					else {
+						row.append('<td></td>');
+					}
+				}
+			}
+			else if (seq.part === DiffPartType.TO) {
+				var diff = this._makeDiffSeqElement(seq);
+				if (0 < diff.length) {
+					row.append('<td></td>');
+					column.append(diff);
+					row.append(column);
+				}
+			}
+			if (0 < row.length) {
+				tbody.append(row);
+			}
+			++index;
+		}
+	},
+
+	/**
 	 * Emphasize text.
 	 *
 	 * @param {String} text Text emphasize to.

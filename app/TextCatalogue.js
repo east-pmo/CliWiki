@@ -7,7 +7,7 @@
  * http://cliwiki.codeplex.com/license
  *
  * @author Osada Jun(EAST Co.,Ltd. - http://www.est.co.jp/)
- * @version 0.3.1.1(20120919)
+ * @version 0.4.1.1(20121113)
  */
 
 //
@@ -35,7 +35,8 @@ function TextCatalogue(lang) {
 				': Do you want to delete this page?' : ': このページを削除しますか?',
 
 				'Keyword' : 'キーワード',
-				'Page name' : 'ページ名'
+				'Page name' : 'ページ名',
+				'Comparison...' : '比較...'
 			};
 			break;
 	}

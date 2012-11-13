@@ -18,12 +18,13 @@ $(function() {
 	CliWikiFooterUI.getAppVersionElement().text(Preference.getAppVersion());
 
 	var tests = [
+		new DiffExtractorTest(),
+		new PageSearcherTest(),
 		new FormatUtilitiesTest(),
 		new FormatterCreatorTest(),
 		new TextFormatterTest(),
 		new ListFormatterTest(),
 		new TextCatalogueTest(),
-		new PageSearcherTest(),
 		new DateExtensionTest(),
 		new StringExtensionTest()
 	];

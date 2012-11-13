@@ -17,6 +17,7 @@
 	<script src="TextCatalogue.js"></script>
 	<script src="CliWikiFormatter.js"></script>
 	<script src="WikiPageStocker.js"></script>
+	<script src="DiffExtractor.js"></script>
 	<script src="PageSearcher.js"></script>
 	<script src="CliWikiUI.js"></script>
 	<script src="CliWiki.js"></script>
@@ -151,9 +152,29 @@
 									<span lang="ja">更新日時 / タイトル</span>
 									<span lang="en">Update time / Title</span>
 								</th>
+								<th class="operation"></th>
 							</tr>
 						</thead>
 						<tbody id="pageUpdateHistoryList">
+						</tbody>
+					</table>
+				</section>
+				<section id="pageDifference">
+					<nav>
+						<ul>
+							<li><a id="pageDifferenceViewLatest" href="#"><span lang="ja">最新版表示</span><span lang="en">View latest revision</span></a></li>
+							<li><a id="pageDifferenceViewUpdate" href="#"><span lang="ja">ページ更新履歴</span><span lang="en">Page update history</span></a></li>
+						</ul>
+					</nav>
+					<h1><span lang="ja">差分</span><span lang="en">Difference</span> - <span id="pageDifferencePageName"></span></h1>
+					<table class="difference">
+						<thead>
+							<tr>
+								<th><span id="pageDiffFromPageUpdateTime"></span><br /><span id="pageDiffFromPageTitle"></span></th>
+								<th><span id="pageDiffToPageUpdateTime"></span><br /><span id="pageDiffToPageTitle"></span></th>
+							</tr>
+						</thead>
+						<tbody id="pageDiffSequence">
 						</tbody>
 					</table>
 				</section>

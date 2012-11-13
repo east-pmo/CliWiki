@@ -7,7 +7,7 @@
  * http://cliwiki.codeplex.com/license
  *
  * @author Osada Jun(EAST Co.,Ltd. - http://www.est.co.jp/)
- * @version 0.3.1.1(20120919)
+ * @version 0.4.1.1(20121113)
  */
 
 //
@@ -62,7 +62,6 @@ var CliWikiUI = {
 		return $('#sideBarMenu #recentUpdateContent');
 	},
 
-	
 	/**
      * Get presentation title element
      * 
@@ -151,6 +150,42 @@ var CliWikiUI = {
      */
 	getPageUpdateHistoryListElement: function() {
 		return $('#pageUpdateHistoryList');
+	},
+
+	/**
+     * Get page difference view latest link element.
+     * 
+     * @return {Object} View latest link element.
+     */
+	getPageDifferenceViewLatestElement: function() {
+		return $('#pageDifference #pageDifferenceViewLatest');
+	},
+
+	/**
+     * Get page difference view update history link element.
+     * 
+     * @return {Object} View update history link element.
+     */
+	getPageDifferenceViewUpdateHistoryElement: function() {
+		return $('#pageDifference #pageDifferenceViewUpdate');
+	},
+
+	/**
+     * Get page difference title element.
+     * 
+     * @return {Object} Page update history title element.
+     */
+	getPageDifferenceTitleElement: function() {
+		return $('#pageDifference span#pageDifferencePageName');
+	},
+
+	/**
+     * Get page difference sequence element.
+     * 
+     * @return {Object} Page difference sequence element.
+     */
+	getPageDifferenceSequenceElement: function() {
+		return $('#pageDifference tbody#pageDiffSequence');
 	},
 
 	/**
@@ -268,12 +303,28 @@ var CliWikiUI = {
 	},
 
 	/**
-     * hide editor.
+     * Hide editor.
      */
 	hideEditor: function() {
 		$('menu button.edit').hide();
 		$('menu button.presentation').show();
 		$('#source').hide();
+	},
+
+	/**
+     * Set page difference section header info.
+     *
+     * @param {Object} fromPage From page of comparison target.
+     * @param {Object} toPage To page of comparison target.
+     */
+	setPageDifferenceHeaderInfo: function(fromRev, fromPage, toRev, toPage) {
+		var sec = $('section#pageDifference');
+		var fromTime = fromRev + ' : ' + fromPage.getLastUpdateTime();
+		sec.find('span#pageDiffFromPageUpdateTime').text(fromTime);
+		sec.find('span#pageDiffFromPageTitle').text(fromPage.title);
+		var toTime = toRev + ' : ' + toPage.getLastUpdateTime();
+		sec.find('span#pageDiffToPageUpdateTime').text(toTime);
+		sec.find('span#pageDiffToPageTitle').text(toPage.title);
 	},
 
 	/**

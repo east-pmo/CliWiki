@@ -7,7 +7,7 @@
  * http://cliwiki.codeplex.com/license
  *
  * @author Osada Jun(EAST Co.,Ltd. - http://www.est.co.jp/)
- * @version 0.3.1.1(20120919)
+ * @version 0.4.1.1(20121113)
  */
 
 //
@@ -228,7 +228,7 @@ Page.prototype = {
 	// Public function
 	//
 
-	/** 
+	/**
 	 * Get page title.
 	 * 
 	 * @return {String} Page title.
@@ -237,6 +237,15 @@ Page.prototype = {
 		return this.title !== undefined && 0 < this.title.length
 			? this.title
 			: this.name;
+	},
+
+	/**
+	 * Get last update time literal.
+	 * 
+	 * @return {String} Last update time literal.
+	 */
+	getLastUpdateTime: function() {
+		return this.lastUpdateTime !== null ? this.lastUpdateTime : '-';
 	}
 }
 
@@ -286,6 +295,15 @@ PageInfo.prototype = {
 	 */
 	getUpdateCount: function() {
 		return this._updateCount - 1;
+	},
+
+	/**
+	 * Get last update time literal.
+	 * 
+	 * @return {String} Last update time literal.
+	 */
+	getLastUpdateTime: function() {
+		return this.lastUpdateTime !== null ? this.lastUpdateTime : '-';
 	}
 }
 
@@ -393,8 +411,8 @@ WikiPageStocker.prototype = {
 		return pageContent;
 	},
 
-	/** 
-	 * Get content archives of specified page
+	/**
+	 * Get content archives of specified page.
 	 *
 	 * @param {String} pageName Target page name.
 	 * @return {Object} Content archives of specified page.
@@ -411,8 +429,21 @@ WikiPageStocker.prototype = {
 		return pageArchives;
 	},
 
+	/**
+	 * Get page content of specfied revision.
+	 *
+	 * @param {String} pageName Target page name.
+	 * @param {Number} revision Target revision.
+	 * @return {Object} Content archives of specified page.
+	 */
+	getPageContentOfSpecifiedRevision: function(pageName, revision) {
+		var pageArchives = this.getPageContentArchives(pageName);
+		var page = pageArchives[pageArchives.length - revision];
+		return new Page(page.name, page.title, page.content, page.lastUpdateTime);
+	},
+
 	/** 
-	 * Store page
+	 * Store page.
 	 *
 	 * @param {String} pageName Target page name.
 	 * @param {String} title Title of content.
@@ -431,7 +462,7 @@ WikiPageStocker.prototype = {
 	},
 
 	/** 
-	 * Delete page
+	 * Delete page.
 	 *
 	 * @param {String} pageName Target page name.
 	 */
