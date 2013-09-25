@@ -2,12 +2,12 @@
  * @fileOverview WikiText formatter class definitions
  * http://cliwiki.codeplex.com/
  *
- * Copyright 2012 EAST Co.,Ltd.
+ * Copyright 2012-2013 EAST Co.,Ltd.
  * Licensed under the MIT license.
  * http://cliwiki.codeplex.com/license
  *
  * @author Osada Jun(EAST Co.,Ltd. - http://www.est.co.jp/)
- * @version 0.2.2.1(20120904)
+ * @version 0.5.1.1(20130925)
  */
 
 //
@@ -131,6 +131,21 @@ var FormatUtilities = {
      */
 	isWikiName: function(phrase) {
 		return phrase.search(/^([A-Z][a-z0-9]+){2,}$/) === 0;
+	},
+
+	/**
+	 * Make WikiName link element.
+	 *
+	 * @param {String} url Target WikiName
+	 * @return {String} Link element string
+	 */
+	makeWikiNameLinkElement: function(wikiName, literal) {
+		var startTag = FormatUtilities.makeStartTag('a', [
+			{ 'name': 'href', 'value': '#' },
+			{ 'name': 'class', 'value': 'wikiPage' },
+			{ 'name': 'title', 'value': wikiName }
+		]);
+		return startTag +  FormatUtilities.escape(literal) + '</a>';
 	}
 }
 
@@ -526,7 +541,7 @@ TextFormatter.prototype = {
 					|| (0 < start && processText.charAt(start - 1) === ' ')) {
 						var wikiName = match[0];
 						var end = start + wikiName.length;
-						if (end + 1 === processText.length
+						if (end === processText.length
 						|| processText.charAt(end) === ' ') {
 							phrases.push(processText.substring(0, start).trim());
 							phrases.push(wikiName);
@@ -570,31 +585,6 @@ TextFormatter.prototype = {
 	 */
 	_isOuterLink: function(phrase) {
 		return phrase.search(this._getLinkUrlPattern()) === 0;
-	},
-
-	/**
-	 * Check phrase is WikiName.
-	 *
-	 * @param {String} url Target phrase
-	 * @return {Boolean} True if phrase is WikiName.
-	 */
-	_isWikiName: function(phrase) {
-		return phrase.search(/^([A-Z][a-z0-9]+){2,}$/) === 0;
-	},
-
-	/**
-	 * Make WikiName link element.
-	 *
-	 * @param {String} url Target WikiName
-	 * @return {String} Link element string
-	 */
-	_makeWikiNameLinkElement: function(wikiName, literal) {
-		var startTag = FormatUtilities.makeStartTag('a', [
-			{ 'name': 'href', 'value': '#' },
-			{ 'name': 'class', 'value': 'wikiPage' },
-			{ 'name': 'title', 'value': wikiName }
-		]);
-		return startTag +  FormatUtilities.escape(literal) + '</a>';
 	},
 
 	/**
@@ -645,7 +635,7 @@ TextFormatter.prototype = {
 		return [
 			this._formatText(phrase.substring(0, start)),
 			FormatUtilities.isWikiName(link)
-				? this._makeWikiNameLinkElement(link, literal)
+				? FormatUtilities.makeWikiNameLinkElement(link, literal)
 				: this._formatLinkUrl(link, literal),
 			this._formatText(phrase.substring(end + 2))
 		].join('');
@@ -726,8 +716,8 @@ TextFormatter.prototype = {
 	 */
 	_formatPhrase: function(phrase) {
 		var formatted = '';
-		if (this._isWikiName(phrase)) {
-			formatted = this._makeWikiNameLinkElement(phrase, phrase);
+		if (FormatUtilities.isWikiName(phrase)) {
+			formatted = FormatUtilities.makeWikiNameLinkElement(phrase, phrase);
 		}
 		else if ((this._allowFileScheme && phrase.match(/^(https?|file):\/\/.+$/))
 		|| (this._allowFileScheme === false && phrase.match(/^https?:\/\/.+$/))) {
@@ -1228,9 +1218,9 @@ CliWikiFormatter.prototype = {
 	/** 
 	 * Format contents
 	 * 
-	 * @param {String} contents CliWiki markuped text
+	 * @param {String} contents CliWiki markuped text.
 	 * @param {Boolean} allowFileScheme Allow file shceme in link format.
-	 * @return {String} Formatted text
+	 * @return {String} Formatted text.
 	 */
 	format: function(contents, allowFileScheme) {
 		var formatted = '';

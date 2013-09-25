@@ -60,7 +60,7 @@
 						<li> 大文字の英字で始まり、小文字の英字または数字が続く。</li>
 						<li> 2.が二回以上繰りかえされる。</li>
 					</ol>
-<p>本文にWikiNameを記述すると対応するページ名のページへのリンクを自動的に設定します。WikiNameを記述することでページとページの関連づけを簡単に行うことができます。<br />
+<p>本文にWikiNameを記述すると対応するページ名のページへのリンクを自動的に設定します。WikiNameを記述することでページとページの関連づけを簡単に行えます。<br />
 	対応するページ名のページが存在しないときは新規ページ作成用リンクを設定します。</p>
 <p>ページ名は「ページ一覧」などで確認できます。</p>
 					</article>
@@ -84,19 +84,33 @@
 					</article>
 					<article>
 						<h2>ページの削除</h2>
-						<p>ページを削除するにはページの編集を開始した状態でテキスト入力エディターの内容をすべて削除して「更新」ボタンを選択してください。確認メッセージが表示されるので、「OK」ボタンを選択するとページが削除されます。</p>
+						<p>ページを削除するにはページの編集を開始してテキスト入力エディターの内容をすべて削除して「更新」ボタンを選択してください。確認メッセージが表示されるので、「OK」ボタンを選択するとページが削除されます。</p>
 						<p><strong>注意: 削除したページの内容は取り戻せません。削除するときは慎重に確認してください。</strong></p>
 						<p>なおFrontPageは削除できません。</p>
 					</article>
 					<article>
 						<h2>検索</h2>
 						<p>グローバルメニューの「キーワード」入力フィールドにキーワードを入力して「検索」ボタンを選択するとページを検索します。<br />
-							検索するとき、アルファベットの大文字と小文字は区別します。<br />
+							アルファベットの大文字と小文字は区別します。<br />
 							検索キーワードは空白で区切ることで複数指定できます。複数指定したときはいずれかのキーワードを含むページを探します。空白を含む語句を検索したいときはダブルクオーテーション(&quot;)で検索語句を囲んでください。</p>
 					</article>
 				</section>
 				<section id="format">
 					<h1>書式</h1>
+					<p>書式として次を選択できます:</p>
+					<ul>
+						<li>CliWiki記法(ほぼ<a href="http://hikiwiki.org/ja/?TextFormattingRules" target="_blank">Hiki記法</a>互換)</li>
+						<li><a href="http://daringfireball.net/projects/markdown/" target="_blank">Markdown</a>記法</li>
+					</ul>
+					<p>記法の指定は「設定」の「マークアップ」選択フィールドで可能です。編集時にページごとに指定することもできます。</p>
+
+					<p>Markdown記法については次を参照してください:</p>
+					<ul>
+						<li><a href="http://daringfireball.net/projects/markdown/syntax" target="_blank">Markdown Syntax Documentation</a>(英語)</li>
+						<li><a href="http://ja.wikipedia.org/wiki/Markdown#.E8.A8.98.E6.B3.95.E3.81.AE.E4.BE.8B" target="_blank">Markdown - ウィキペディア</a>(日本語)</li>
+					</ul>
+
+					<p>CliWiki記法について次で説明します。</p>
 					<h2>段落書式</h2>
 					<h3>見出し</h3>
 					<p>'!'ではじまる行は見出しになります。'!'の数でレベルを指定します。この段落の前の見出しは'!! 見出し'と指定します。</p>
@@ -251,25 +265,38 @@
 								<li>iCloud(?)</li>
 							</ul>
 						</li>
-						<li> 各種設定</li>
-						<li> Canvas / SVG記録</li>
-						<li> プラグイン機能実現</li>
-						<li> テスト作成</li>
-						<li> 多言語化</li>
-						<li> Wiki書式カスタマイズ / 選択</li>
-						<li> 更新時位置情報記録</li>
+						<li>各種設定</li>
+						<li>Canvas / SVG記録</li>
+						<li>プラグイン機能実現</li>
+						<li>テスト作成</li>
+						<li>多言語化</li>
+						<li>更新時位置情報記録</li>
+						<li>メニューリストの並び替え・変更</li>
 					</ul>
 				</section>
 				<section id="contactUs">
 					<h1>お問い合わせ</h1>
 					<p>CliWikiは<a href="http://www.est.co.jp" target="_blank">イースト株式会社</a>が作成・提供するHTML5アプリケーションです。</p>
-					<p>営業的なお問い合わせは<a href="http://est.jp/html5/">est.jp - HTML5</a>からお願いします。</p>
+					<p>営業的なお問い合わせは<a href="http://est.jp/html5/" target="_blank">est.jp - HTML5</a>からお願いします。</p>
 					<p>技術的なお問い合わせやご意見・ご感想は<img class="logo" src="./res/f_logo.svg" align="left" /><a href="http://www.facebook.com/groups/HTML5east/" target="_blank">Facebookのhtml5eastグループ</a>でお聞かせいただければ幸いです。</p>
 					<h2>プロジェクト情報</h2>
 					<p>CliWikiは<a href="http://www.codeplex.com/" target="_blank">CodePlex</a>で<a href="http://cliwiki.codeplex.com/" target="_blank">オープンソースプロジェクトとして公開しています</a>。</p>
+					<h3>利用ソフトウェア</h3>
+					<p>CliWikiは次のオープンソースソフトウェアを利用しています。各開発者の方々に謹んで感謝の意を表します。</p>
+					<h4><a href="http://jquery.com/" target="_blank">jQuery</a> 1.7.2</h4>
+					<blockquote cite="http://jquery.com/">jQuery is a fast, small, and feature-rich JavaScript library. It makes things like HTML document traversal and manipulation, event handling, animation, and Ajax much simpler with an easy-to-use API that works across a multitude of browsers. With a combination of versatility and extensibility, jQuery has changed the way that millions of people write JavaScript.</blockquote>
+					<h4><a href="https://github.com/chjj/marked" target="_blank">marked</a> 2013-08-24</h4>
+					<blockquote cite="https://github.com/chjj/marked">A markdown parser and compiler. Built for speed.</blockquote>
+					<h4><a href="http://pivotal.github.io/jasmine/" target="_blank">Jasmine</a> 1.3.1</h4>
+					<blockquote cite="http://pivotal.github.io/jasmine/">Jasmine is a behavior-driven development framework for testing JavaScript code. It does not depend on any other JavaScript frameworks. It does not require a DOM. And it has a clean, obvious syntax so that you can easily write tests.</blockquote>
 				</section>
 				<section id="updateHistory">
 					<h1>最近の更新</h1>
+					<h2 id="0.5.1.1(20130925)">0.5.1.1(20130925)</h2>
+					<ul>
+						<li>書式として<a href="http://daringfireball.net/projects/markdown/syntax" target="_blank">Markdown記法</a>を利用可能に。</li>
+						<li>CliWiki記法で行末のWikiNameをリンクに変換できなかった障害を修正。</li>
+					</ul>
 					<h2 id="0.4.1.1(20121113)">0.4.1.1(20121113)</h2>
 					<ul>
 						<li>ページ履歴の差分表示機能を実装。</li>

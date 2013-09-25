@@ -2,12 +2,12 @@
  * @fileOverview Preference class definition
  * http://cliwiki.codeplex.com/
  *
- * Copyright 2012 EAST Co.,Ltd.
+ * Copyright 2012-2013 EAST Co.,Ltd.
  * Licensed under the MIT license.
  * http://cliwiki.codeplex.com/license
  *
  * @author Osada Jun(EAST Co.,Ltd. - http://www.est.co.jp/)
- * @version 0.4.1.1(20121113)
+ * @version 0.5.1.1(20130925)
  */
 
 //
@@ -58,7 +58,7 @@ var Preference = {
 	 * @return {String} Application version.
 	 */
 	getAppVersion: function() {
-		return 'CliWiki Ver.0.4.1.1(20121113)';
+		return 'CliWiki Ver.0.5.1.1(20130925)';
 	},
 
 	/**
@@ -75,6 +75,22 @@ var Preference = {
 			lang = 'en';
 		}
 		return lang;
+	},
+
+	/**
+	 * Get mark up style.
+	 *
+	 * @return {String} Mark up style.
+	 */
+	getMarkUpStyle: function() {
+		Preference._loadValues();
+		var style = Preference._values._markUpStyle !== null
+					? Preference._values._markUpStyle
+					: 'cliwiki';
+		if ((typeof style == 'undefined') || style === null || style.length === 0) {
+			style = 'cliwiki';
+		}
+		return style;
 	},
 
 	/**
@@ -113,6 +129,16 @@ var Preference = {
 	 */
 	setLanguage: function(lang) {
 		Preference._values._language = lang;
+		Preference._saveValues();
+	},
+
+	/**
+	 * Set mark up style.
+	 *
+	 * @param {String} Mark up style.
+	 */
+	setMarkUpStyle: function(style) {
+		Preference._values._markUpStyle = style;
 		Preference._saveValues();
 	},
 

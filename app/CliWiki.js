@@ -2,12 +2,12 @@
  * @fileOverview CliWiki application entry and class definitions
  * http://cliwiki.codeplex.com/
  *
- * Copyright 2012 EAST Co.,Ltd.
+ * Copyright 2012-2013 EAST Co.,Ltd.
  * Licensed under the MIT license.
  * http://cliwiki.codeplex.com/license
  *
  * @author Osada Jun(EAST Co.,Ltd. - http://www.est.co.jp/)
- * @version 0.4.1.1(20121113)
+ * @version 0.5.1.1(20130925)
  */
 
 //
@@ -21,6 +21,12 @@
  */
 function CliWikiApp() {
     /**
+     * Allow next version function
+     * @return {Boolean}
+     */
+	this._allowNextVersionFunction = false;
+
+    /**
      * Page stocker
      * @return {WikiPageStocker}
      */
@@ -33,7 +39,7 @@ function CliWikiApp() {
 	this._currentPageName = null;
 
     /**
-     * Preview update timeer id
+     * Preview update timer id
      * @return {Number}
      */
 	this._previewUpdateTimerId = null;
@@ -47,6 +53,10 @@ CliWikiApp.prototype = {
      * Initialize application.
      */
 	init: function() {
+		if (this._allowNextVersionFunction === false) {
+			$('.nextVersion').hide();
+		}
+
 		CliWikiFooterUI.getAppVersionElement().text(Preference.getAppVersion());
 		CliWikiUI.changeDisplayLanguage();
 		CliWikiUI.hideEditor();
@@ -69,7 +79,7 @@ CliWikiApp.prototype = {
 	},
 
     /**
-     * Check available of strage.
+     * Check available of storage.
      *
      * @return {Boolean} True if available.
      */
@@ -116,7 +126,8 @@ CliWikiApp.prototype = {
 			var previewPage = {
 				'name' : instance.getCurrentPageName(),
 				'title' : instance.getSourceTitle(),
-				'content' : instance.getSourceContent()
+				'content' : instance.getSourceContent(),
+				'markUpStyle': CliWikiUI.getSelectedPageMarkUpStyle()
 			};
 			instance.setPreviewPresentation(previewPage);
 		}, Preference.getPreviewUpdateIntervalMs());
@@ -151,18 +162,17 @@ CliWikiApp.prototype = {
 		var pageName = this.getCurrentPageName();
 		var newContent = this.getSourceContent();
 		if (0 < newContent.length) {
-			var newPage = {
-				'name' : pageName,
-				'title': this.getSourceTitle(),
-				'content' : newContent,
-				'lastUpdateTime' : new Date().toISO8601String()
-			};
-
+			var newPage = new Page(pageName,
+								   this.getSourceTitle(),
+								   newContent,
+								   new Date().toISO8601String(),
+								   CliWikiUI.getSelectedPageMarkUpStyle());
 			var updated = true;
 			if (this._pageStocker.hasPage(pageName)) {
 				var curPage = this._pageStocker.getLatestPageContent(pageName);
 				updated = (curPage.title !==  newPage.title
-						|| curPage.content !== newPage.content);
+						|| curPage.content !== newPage.content
+						|| curPage.markUpStyle !== newPage.markUpStyle);
 			}
 
 			if (updated) {
@@ -204,7 +214,7 @@ CliWikiApp.prototype = {
 		var updatedPage = page;
 		if (updatedPage !== undefined && updatedPage !== null) {
 			this._currentPageName = updatedPage.name;
-			this._pageStocker.storePage(updatedPage.name, updatedPage.title, updatedPage.content);
+			this._pageStocker.storePage(updatedPage);
 		}
 		else {
 			updatedPage = this._getCurrentPageLatestContent();
@@ -311,7 +321,11 @@ CliWikiApp.prototype = {
 		var revision = archives.length;
 		var instance = this;
 		jQuery.each(archives, function() {
-			var page = new Page(pageName, this.title, this.content, this.lastUpdateTime);
+			var page = new Page(pageName,
+								this.title,
+								this.content,
+								this.lastUpdateTime,
+								this.markUpStyle);
 			var row = $('<tr></tr>');
 			row.append('<td class="pageRevision">' + revision + '</td>');
 
@@ -329,7 +343,7 @@ CliWikiApp.prototype = {
 				row.find('details summary').on('click', function() {
 					var content = $(this).nextAll('div');
 					if (content.text().length === 0) {
-						content.html(instance._format(page.content));
+						content.html(instance._format(page.content, page.markUpStyle));
 						content.show();
 					}
 					else {
@@ -405,6 +419,14 @@ CliWikiApp.prototype = {
 			Preference.setLanguage(changeLang);
 			CliWikiUI.changeDisplayLanguage();
 		});
+
+		var style = Preference.getMarkUpStyle();
+		var selectStyle = CliWikiUI.getMarkUpStyleElement();
+		selectStyle.val(style);
+		selectStyle.on('change', function() {
+			var changeStyle = selectStyle.children('option:selected').val();
+			Preference.setMarkUpStyle(changeStyle);
+		});
 	},
 
     /**
@@ -473,22 +495,17 @@ CliWikiApp.prototype = {
 	//
 
     /**
-     * Get formatter instance.
-     *
-     * @return {Object} Formatter instance.
-     */
-	_getFormatter: function() {
-		return new CliWikiFormatter();
-	},
-
-    /**
      * Format page data to html.
      *
      * @param {String} pageContent Page content data.
+     * @param {String} markUpStyle Mark up style.
      * @return {String} Formatted html.
      */
-	_format: function(pageContent) {
-		return this._getFormatter().format(pageContent, Preference.getAllowFileScheme());
+	_format: function(pageContent, markUpStyle) {
+		var formatter = markUpStyle !== undefined && markUpStyle === 'markdown'
+						? new MarkdownFormatter()
+						: new CliWikiFormatter();
+		return formatter.format(pageContent, Preference.getAllowFileScheme());
 	},
 
     /**
@@ -818,7 +835,7 @@ CliWikiApp.prototype = {
 		CliWikiUI.getPresentationTitleElement().text(page.title !== undefined && 0 < page.title.length ? page.title : page.name);
 
 		var content = CliWikiUI.getPresentationContentElement();
-		content.html(this._format(page.content));
+		content.html(this._format(page.content, page.markUpStyle));
 
 		if (asPreview === false) {
 			var instance = this;
@@ -855,6 +872,12 @@ CliWikiApp.prototype = {
 		CliWikiUI.getSourcePageNameElement().text(page.name);
 		CliWikiUI.getSourceTitleElement().val(page.title !== undefined && 0 < page.title.length ? page.title : page.name);
 		CliWikiUI.getSourceContentElement().val(page.content);
+
+		var pageMarkUpStyle = Preference.getMarkUpStyle();
+		if (page.markUpStyle !== undefined && page.markUpStyle !== null) {
+			pageMarkUpStyle = page.markUpStyle;
+		}
+		CliWikiUI.getPageMarkUpStyleElement().val(pageMarkUpStyle);
 	},
 
     /**

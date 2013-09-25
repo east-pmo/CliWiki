@@ -10,12 +10,15 @@
 	<link rel="stylesheet" type="text/css" href="cliwiki.print.css" media="print" />
 	<link rel="SHORTCUT ICON" href="icon_16.png" />
 	<script src="jquery-1.7.2.min.js"></script>
+	<script src="./lib/marked/marked.js"></script>
+
 	<script src="extension.String.js"></script>
 	<script src="extension.Date.js"></script>
 	<script src="Html5Feature.js"></script>
 	<script src="Preference.js"></script>
 	<script src="TextCatalogue.js"></script>
 	<script src="CliWikiFormatter.js"></script>
+	<script src="MarkdownFormatter.js"></script>
 	<script src="WikiPageStocker.js"></script>
 	<script src="DiffExtractor.js"></script>
 	<script src="PageSearcher.js"></script>
@@ -33,7 +36,7 @@
 				<li><a id="pageListMenuItem" href="#"><span lang="ja">ページ一覧</span><span lang="en">Page list</span></a></li>
 				<li><a id="updateHistoryMenuItem" href="#"><span lang="ja">更新履歴</span><span lang="en">Update history</span></a></li>
 				<li id="preferenceMenuItem"><a href="#"><span lang="ja">設定</span><span lang="en">Preference</span></a></li>
-				<li><a href="help.ja.html" target="_blank"><span lang="ja">ヘルプ</span><span lang="en">Help</span></a></li>
+				<li><a id="help" href="help.ja.html" target="_blank"><span lang="ja">ヘルプ</span><span lang="en">Help</span></a></li>
 			</ul>
 		</nav>
 	</header>
@@ -68,6 +71,13 @@
 								<h2><span lang="ja">タイトル</span><span lang="en">Title</span></h2>
 								<div><input type="text" id="sourceTitle" size="40"/></label></div>
 								<h2><span lang="ja">本文</span><span lang="en">Contents</span></h2>
+								<div>
+									<label for="pageMarkUpStyle"><span lang="ja">マークアップ</span><span lang="en">Mark up</span>:</label>
+									<select id="pageMarkUpStyle">
+										<option value="cliwiki">CliWiki(like Hiki)</option>
+										<option value="markdown">Markdown</option>
+									</select>
+								</div>
 								<textarea id="sourceContent" rows="20"></textarea>
 								<hr />
 							</details>
@@ -225,6 +235,13 @@
 								<select id="displayLanguage">
 									<option value="en">English</option>
 									<option value="ja">日本語</option>
+								</select>
+							</p>
+							<p>
+								<label for="markUpStyle"><span lang="ja">マークアップ</span><span lang="en">Mark up</span>:</label>
+								<select id="markUpStyle">
+									<option value="cliwiki">CliWiki(like Hiki)</option>
+									<option value="markdown">Markdown</option>
 								</select>
 							</p>
 							<p id="allowFileSchemePreference">

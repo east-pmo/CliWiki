@@ -2,12 +2,12 @@
  * @fileOverview CliWiki user interface class definitions
  * http://cliwiki.codeplex.com/
  *
- * Copyright 2012 EAST Co.,Ltd.
+ * Copyright 2012-2013 EAST Co.,Ltd.
  * Licensed under the MIT license.
  * http://cliwiki.codeplex.com/license
  *
  * @author Osada Jun(EAST Co.,Ltd. - http://www.est.co.jp/)
- * @version 0.4.1.1(20121113)
+ * @version 0.5.1.1(20130925)
  */
 
 //
@@ -207,12 +207,39 @@ var CliWikiUI = {
 	},
 
 	/**
-     * Get display language select element.
+	 * Get display language select element.
      * 
      * @return {Object} Display language select element.
      */
 	getDisplayLanguageElement: function() {
 		return $('section#preference select#displayLanguage');
+	},
+
+	/**
+	 * Get page mark up style select element.
+	 * 
+	 * @return {Object} Mark up style select element.
+	 */
+	getPageMarkUpStyleElement: function() {
+		return $('section#page select#pageMarkUpStyle');
+	},
+
+	/**
+	 * Get page mark up style select element.
+	 * 
+	 * @return {Object} Mark up style select element.
+	 */
+	getSelectedPageMarkUpStyle: function() {
+		return this.getPageMarkUpStyleElement().children('option:selected').val();
+	},
+	
+	/**
+	 * Get mark up style select element.
+	 * 
+	 * @return {Object} Mark up style select element.
+	 */
+	getMarkUpStyleElement: function() {
+		return $('section#preference select#markUpStyle');
 	},
 
 	/**
@@ -282,6 +309,12 @@ var CliWikiUI = {
 			var elem = $(this);
 			elem.attr('placeholder', catalogue.getText(elem.attr('title')));
 		});
+		$('select option').each(function() {
+			var elem = $(this);
+			elem.text(catalogue.getText(elem.text()));
+		});
+
+		$('a#help').attr('href', lang === 'ja' ? 'help.ja.html' : 'help.en.html');
 	},
 
     /**

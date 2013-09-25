@@ -2,12 +2,12 @@
  * @fileOverview TextCatalogue class definition
  * http://cliwiki.codeplex.com/
  *
- * Copyright 2012 EAST Co.,Ltd.
+ * Copyright 2012-2013 EAST Co.,Ltd.
  * Licensed under the MIT license.
  * http://cliwiki.codeplex.com/license
  *
  * @author Osada Jun(EAST Co.,Ltd. - http://www.est.co.jp/)
- * @version 0.4.1.1(20121113)
+ * @version 0.5.1.1(20130925)
  */
 
 //

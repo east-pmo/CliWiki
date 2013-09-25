@@ -3,7 +3,7 @@
 	"name": "CliWiki",
 	"description": "__MSG_appDesc__",
 	"default_locale": "ja",
-	"version": "0.4.1.1",
+	"version": "0.5.1.1",
 	"app": {
 		"launch": {
 			"local_path": "index.html"
