@@ -4,6 +4,7 @@
 <head>
 	<meta http-equiv="content-type" content="application/xhtml+xml" />
 	<meta http-equiv="content-language" content="ja" />
+	<meta charset="utf-8" />
 	<meta name="application-name" content="CliWiki" />
 	<title>CliWiki Help</title>
 	<link rel="stylesheet" type="text/css" href="compatibility.css" />
@@ -234,22 +235,9 @@
 				</section>
 				<section id="roadmap">
 					<h1>今後の予定</h1>
-					<h2> 優先度高め</h2>
+					<h2>全般</h2>
 					<ul>
-						<li> ページ更新関係の機能作成
-							<ul>
-								<li> ページ更新の取り消し</li>
-							</ul>
-						</li>
-						<li> データのインポート / エクスポート</li>
-					</ul>
-					<h2> 優先度中くらい</h2>
-					<ul>
-						<li>編集時のリアルタイムプレビューのオン / オフ</li>
-					</ul>
-					<h2> 優先度低め</h2>
-					<ul>
-						<li>独立したHTML5アプリケーションとしての動作</li>
+						<li>jQueryを最新版に更新</li>
 						<li>モバイルデバイス対応</li>
 						<li>印刷対応の充実</li>
 					</ul>
@@ -259,7 +247,7 @@
 							<ul>
 								<li>Googleドキュメントのスプレッドシート</li>
 								<li>Dropbox</li>
-								<li>SkyDrive</li>
+								<li>OneDrive</li>
 								<li>Google Drive</li>
 								<li>Amazon S3</li>
 								<li>iCloud(?)</li>
@@ -268,10 +256,12 @@
 						<li>各種設定</li>
 						<li>Canvas / SVG記録</li>
 						<li>プラグイン機能実現</li>
-						<li>テスト作成</li>
+						<li>ユニットテストの追加</li>
 						<li>多言語化</li>
 						<li>更新時位置情報記録</li>
 						<li>メニューリストの並び替え・変更</li>
+						<li>各ページのHTML出力エクスポート</li>
+						<li>編集時のリアルタイムプレビューのオン / オフ</li>
 					</ul>
 				</section>
 				<section id="contactUs">
@@ -292,6 +282,12 @@
 				</section>
 				<section id="updateHistory">
 					<h1>最近の更新</h1>
+					<h2 id="0.6.1.1(20140418)">0.6.1.1(20140418)</h2>
+					<ul>
+						<li>データのエクスポート / インポート機能を実装(「設定」ページから実行できます)。</li>
+						<li>コンテンツ編集エリアの高さ指定機能を実装。</li>
+						<li>最終更新の取り消し機能実装。</li>
+					</ul>
 					<h2 id="0.5.1.1(20130925)">0.5.1.1(20130925)</h2>
 					<ul>
 						<li>書式として<a href="http://daringfireball.net/projects/markdown/syntax" target="_blank">Markdown記法</a>を利用可能に。</li>

@@ -2,12 +2,12 @@
  * @fileOverview CliWiki user interface class definitions
  * http://cliwiki.codeplex.com/
  *
- * Copyright 2012-2013 EAST Co.,Ltd.
+ * Copyright 2012-2014 EAST Co.,Ltd.
  * Licensed under the MIT license.
  * http://cliwiki.codeplex.com/license
  *
  * @author Osada Jun(EAST Co.,Ltd. - http://www.est.co.jp/)
- * @version 0.5.1.1(20130925)
+ * @version 0.6.1.1(20140418)
  */
 
 //
@@ -232,14 +232,23 @@ var CliWikiUI = {
 	getSelectedPageMarkUpStyle: function() {
 		return this.getPageMarkUpStyleElement().children('option:selected').val();
 	},
-	
+
 	/**
 	 * Get mark up style select element.
 	 * 
 	 * @return {Object} Mark up style select element.
 	 */
 	getMarkUpStyleElement: function() {
-		return $('section#preference select#markUpStyle');
+		return this._getPreferenceSectionElement().find('select#markUpStyle');
+	},
+
+	/**
+	 * Get editor row line count element.
+	 * 
+	 * @return {Object} Mark up style select element.
+	 */
+	getEditorRowLineCountElement: function() {
+		return this._getPreferenceSectionElement().find('input#edittorRowLineCount');
 	},
 
 	/**
@@ -248,7 +257,25 @@ var CliWikiUI = {
      * @return {Object} Allow file scheme element.
      */
 	getAllowFileSchemeElement: function() {
-		return $('section#preference input#allowFileScheme');
+		return this._getPreferenceSectionElement().find('input#allowFileScheme');
+	},
+
+	/**
+     * Get import file element.
+     * 
+     * @return {Object} Import file element.
+     */
+	getImportFileElement: function() {
+		return  this._getPreferenceSectionElement().find('input#importFileData');
+	},
+
+	/**
+     * Get import message message element.
+     * 
+     * @return {Object} Import message element.
+     */
+	getImportMessageElement: function() {
+		return  this._getPreferenceSectionElement().find('span#importMessage');
 	},
 
 	/**
@@ -265,6 +292,7 @@ var CliWikiUI = {
 	 * Show confirm message.
      *
      * @param {String} msg Confirm message.
+     * @return {Boolean} Result.
      */
 	confirm: function(msg) {
 		var catalogue = new TextCatalogue(Preference.getLanguage());
@@ -294,6 +322,19 @@ var CliWikiUI = {
 		});
 
 		this._setUpPageHeaderEventHandler(app);
+
+		this.getImportFileElement().on('change', function(eventArg) {
+			CliWikiUI.getImportFileElement().attr('disabled', 'disabled');
+
+			var catalogue = new TextCatalogue(Preference.getLanguage());
+			CliWikiUI.getImportMessageElement().text(catalogue.getText('Processing...'));
+
+			var reader = new FileReader();
+			reader.onload = function(file) {
+				app.importPageArchive(file.target.result);
+			};
+			reader.readAsText(eventArg.target.files[0]);
+		});
 	},
 
     /**
@@ -332,6 +373,7 @@ var CliWikiUI = {
 	showEditor: function() {
 		$('menu button.presentation').hide();
 		$('menu button.edit').show();
+		this.getSourceContentElement().attr('rows', Preference.getEditorRowLineCount());
 		$('#source').attr('open', 'open').show();
 	},
 
@@ -393,9 +435,47 @@ var CliWikiUI = {
 		}
 	},
 
+	/**
+     * Set download archive data.
+     *
+     * @param {String} archiveAsJson Page archive data(serialized as JSON).
+     * @param {String} lastUpdateTime Last update time.
+     */
+	setDownloadArchiveData: function(archiveAsJson, lastUpdateTime) {
+		var blob = new Blob([ archiveAsJson ], { 'type': 'application/json' });
+		var url = window.URL || window.webkitURL;
+
+		var fileName = 'CliWiki.pagearchive';
+		if (lastUpdateTime !== null && 0 < lastUpdateTime.length) {
+			fileName += '.';
+			fileName += lastUpdateTime.replace(/[-:]/g, '');
+		}
+
+		var exportAnchorElem = $('a#exportAsFileLink');
+		exportAnchorElem.attr('href', url.createObjectURL(blob));
+		exportAnchorElem.attr('download', fileName + '.json');
+	},
+
+	/**
+	 * Initialize import field elements.
+     */
+	initImportField: function() {
+		this.getImportFileElement().removeAttr('value').removeAttr('disabled');
+		this.getImportMessageElement().text('');
+	},
+
 	//
 	// Private function
 	//
+
+	/**
+     * Get Preference section element.
+     * 
+     * @return {Object} Preference section element.
+     */
+	_getPreferenceSectionElement: function() {
+		return  $('section#preference');
+	},
 
 	/**
      * Set up page header event handler

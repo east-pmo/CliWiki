@@ -2,12 +2,12 @@
  * @fileOverview WikiText formatter class definitions
  * http://cliwiki.codeplex.com/
  *
- * Copyright 2012-2013 EAST Co.,Ltd.
+ * Copyright 2012-2014 EAST Co.,Ltd.
  * Licensed under the MIT license.
  * http://cliwiki.codeplex.com/license
  *
  * @author Osada Jun(EAST Co.,Ltd. - http://www.est.co.jp/)
- * @version 0.5.1.1(20130925)
+ * @version 0.6.1.1(20140418)
  */
 
 //
@@ -69,7 +69,7 @@ LocalStorageAdapter.prototype = {
 	hasPage: function(pageName) {
 		var has = false;
 		var names = this.getPageNameList();
-		for (var index = 0; index < names.length && has === false; index++) {
+		for (var index = 0; index < names.length && has === false; ++index) {
 			has = (names[index] === pageName);
 		}
 		return has;
@@ -149,6 +149,26 @@ LocalStorageAdapter.prototype = {
 	},
 
 	/** 
+	 * Cancel latest update of specfied page.
+	 *
+	 * @param {String} pageName Page name for cancel latest update.
+	 */
+	cancelLatestUpdateOf: function(pageName) {
+		var pageKey = this._makePageKey(pageName);
+		var pages = localStorage.getItem(pageKey);
+		if (pages === null) {
+			throw new Error();
+		}
+		var pagesAsJson = JSON.parse(pages);
+		if (pagesAsJson.length < 2) {
+			throw new Error();
+		}
+
+		pagesAsJson.shift();
+		localStorage.setItem(pageKey, JSON.stringify(pagesAsJson));
+	},
+
+	/** 
 	 * Delete page
 	 *
 	 * @param {String} pageName Target page name.
@@ -169,6 +189,76 @@ LocalStorageAdapter.prototype = {
 			}
 		}
 		this._setPageNameList(names);
+	},
+
+	/** 
+	 * Store page archive for import.
+	 *
+	 * @param {String} pageName Target page name.
+	 * @param {Array} pageArchives Page history archives to store.
+	 */
+	storePageArchive: function(pageName, pageArchives) {
+		localStorage.setItem(this._makePageKey(pageName),
+							 JSON.stringify(pageArchives));
+
+		var names = this.getPageNameList();
+		names.push(pageName);
+		this._setPageNameList(names);
+	},
+
+	/** 
+	 * Merge page archive for import.
+	 *
+	 * @param {String} pageName Target page name.
+	 * @param {Array} mergeArchives Page history archives to merge.
+	 */
+	mergePageArchive: function(pageName, mergeArchives) {
+		var pageArchives = this.getPageContentArchives(pageName);
+		pageArchives = pageArchives.concat(mergeArchives);
+		pageArchives.sort(function(lhs, rhs) {
+			var result = 0;
+			if (lhs.lastUpdateTime === null) {
+				if (rhs.lastUpdateTime !== null) {
+					result = 1;
+				}
+			}
+			else if (rhs.lastUpdateTime === null) {
+				if (lhs.lastUpdateTime !== null) {
+					result =  -1;
+				}
+			}
+			else {
+				if (lhs.lastUpdateTime < rhs.lastUpdateTime) {
+					result = 1;
+				}
+				else if (rhs.lastUpdateTime < lhs.lastUpdateTime) {
+					result = -1;
+				}
+			}
+			return result;
+		});
+
+		var rev = 1;
+		while (rev < pageArchives.length) {
+			var page = pageArchives[rev - 1];
+			var oldPage = pageArchives[rev];
+			if (page.lastUpdateTime === oldPage.lastUpdateTime
+			&& page.title === oldPage.title
+			&& page.content === oldPage.content
+			&& page.markUpStyle === oldPage.markUpStyle) {
+				pageArchives.splice(rev, 1);
+			}
+			else {
+				++rev;
+			}
+		}
+
+		if (this._maxHistory < pageArchives.length) {
+			pageArchives.splice(this._maxHistory - 1, pageArchives.length - this._maxHistory);
+		}
+
+		localStorage.setItem(this._makePageKey(pageName),
+							 JSON.stringify(pageArchives));
 	},
 
 	//
@@ -358,7 +448,7 @@ WikiPageStocker.prototype = {
 	},
 
 	/** 
-	 * Get page info list
+	 * Get page info list.
 	 *
 	 * @param {Boolean} sortByTime Sort by last update time.
 	 * @return {Array} Array of page name.
@@ -375,6 +465,18 @@ WikiPageStocker.prototype = {
 			}
 		}
 		return sortByTime !== false ? this._sortPageInfoList(infos) : infos;
+	},
+
+	/** 
+	 * Get last update time 
+	 *
+	 * @return {String} Last update time
+	 */
+	getLastUpdateTime: function() {
+		var pageInfos = this.getPageInfoList(true);
+		return pageInfos !== null && 0 < pageInfos.length
+				? pageInfos[0].lastUpdateTime
+				: null;
 	},
 
 	/** 
@@ -460,6 +562,59 @@ WikiPageStocker.prototype = {
 	},
 
 	/** 
+	 * Get serialized data.
+	 *
+	 * @return {String} Serialized data.
+	 */
+	getSerializedData: function() {
+		var data = new Object();
+
+		var pageNames = this.getPageNameList();
+		for (var index = 0; index < pageNames.length; ++index) {
+			var pageName = pageNames[index];
+			data[pageName] = this.getPageContentArchives(pageName);
+		}
+
+		return JSON.stringify(data);
+	},
+
+	/** 
+	 * Validate export data.
+	 *
+	 * @param {Object} pages Page archive to validate.
+	 */
+	isValidData: function(pages) {
+		var pageNames = new Array();
+		var hasOwn = {}.hasOwnProperty;
+		for (var pageName in pages) {
+			if (hasOwn.call(pages, pageName)) {
+				pageNames.push(pageName);
+			}
+		}
+		if (pageNames.length === 0) {
+			return false;
+		}
+
+		for (var index = 0; index < pageNames.length; ++index) {
+			var pageHistory = pages[pageNames[index]];
+			if ((typeof pageHistory.length) == 'undefined') {
+				return false;
+			}
+
+			for (var rev = 0; rev < pageHistory.length; ++rev) {
+				var page = pageHistory[rev];
+				if ((typeof page.title) == 'undefined'
+				|| (typeof page.content) == 'undefined'
+				|| (typeof page.lastUpdateTime) == 'undefined') {
+					return false;
+				}
+			}
+		}
+
+		return true;
+	},
+
+	/** 
 	 * Store page.
 	 *
 	 * @param {Object} page Target page.
@@ -474,6 +629,19 @@ WikiPageStocker.prototype = {
 				this._pageList[this._pageList.length] = page.name;
 			}
 		}
+	},
+
+	/** 
+	 * Cancel latest update of specfied page.
+	 *
+	 * @param {String} pageName Page name for cancel latest update.
+	 */
+	cancelLatestUpdateOf: function(pageName) {
+		if (this.isStorageAvailable() === false) {
+			throw new Error();
+		}
+
+		this._storage.cancelLatestUpdateOf(pageName);
 	},
 
 	/** 
@@ -493,6 +661,36 @@ WikiPageStocker.prototype = {
 					break;
 				}
 			}
+		}
+	},
+
+	/** 
+	 * Merge data.
+	 *
+	 * @param {String} pages Page archive.
+	 */
+	merge: function(pages) {
+		var pageNames = new Array();
+		var hasOwn = {}.hasOwnProperty;
+		for (var pageName in pages) {
+			if (hasOwn.call(pages, pageName)) {
+				pageNames.push(pageName);
+			}
+		}
+
+		if (this.isStorageAvailable()) {
+			for (var index = 0; index < pageNames.length; ++index) {
+				var pageName = pageNames[index];
+				if (this.hasPage(pageName)) {
+					this._storage.mergePageArchive(pageName, pages[pageName]);
+				}
+				else {
+					this._storage.storePageArchive(pageName, pages[pageName]);
+				}
+			}
+		}
+		else {
+			throw new Error('No implementation');
 		}
 	},
 
@@ -561,14 +759,30 @@ WikiPageStocker.prototype = {
 
 		var lang = Preference.getLanguage();
 		this._pages = new Object();
-	 	this._pages['FrontPage'] = {
+
+		this._pages['FrontPage'] = {
 			'title' : 'FrontPage',
 			'content' : this._getInitFrontPageContent(lang),
 			'lastUpdateTime' : null
 		};
 	 	this._pages['SandBox'] = {
 			'title' : 'SandBox',
-			'content' : '「編集」ボタンを選択して編集してみてください。\n\n書式は「ヘルプ」の「書式」で確認できます。実際の出力はテキスト入力エディターの下で確認できます。\n「編集」を選択してソースのテキストと見比べてみてください。\n\nCliWikiは書式として次を選択できます:\n\n* CliWiki記法(ほぼ[[Hiki記法|http://hikiwiki.org/ja/?TextFormattingRules]]互換)\n* [[Markdown|http://daringfireball.net/projects/markdown/]]記法\n\n記法の指定は「設定」ページの「マークアップ」選択フィールドで可能です。編集ページでページごとの指定も可能です。\n\nMarkdown記法については次を参照してください:\n\n* [[Markdown Syntax Documentation|http://daringfireball.net/projects/markdown/syntax]](英語)\n* [[Markdown - ウィキペディア|http://ja.wikipedia.org/wiki/Markdown#.E8.A8.98.E6.B3.95.E3.81.AE.E4.BE.8B]](日本語)\n\nCliWiki記法について次で説明します。\n\n! 段落書式\n\n!! 見出し\n\n\'!\'ではじまる行は見出しになります。\'!\'の数でレベルを指定します。\n\n!! 水平線\n\n\'----\'だけを記述すると次のような水平線になります。\n\n----\n\n!! リスト\n\n\'*\'ではじまる連続した行は順序なしのリストになります。\n\n* 項目1\n** 項目1の1\n** 項目1の2\n* 項目2\n* 項目3\n\n\'#\'ではじまる連続した行は順序ありのリストになります。\n\n# 項目1\n# 項目2\n## 項目2の1\n## 項目2の2\n# 項目3\n\n!! 用語解説\n\n\':\'ではじまり、\':\'を挟んで用語と解説を記述した連続行は用語解説になります。\n\n:用語の見出し1:用語1の解説\n:用語の見出し2:用語2の解説\n:用語の見出し3:用語4の解説\n\n\n!! 整形済みテキスト\n\n空白(U+0020)またはタブではじまる行は整形済みテキストとみなします。\n\n 整形済みテキストは\n 改行がそのままのかたちで残ります。\n\n\'<<<\'だけを記述した行から\'>>>\'だけを記述した行のあいだも整形済みテキストとみなします。\n\n!! 表\n\n\'||\'ではじまる行は表のかたちに整形します。\'||\'がセルの区切りになります。行末尾には\'||\'はいりません。\n\nセルの項目の頭に「!」をつけると見出しセルになります。行の連結には「^」を、列の連結には「>」を、連結したい数だけセルの項目頭につけてください。\n\n!!! 記述例\n\n||!行 / 列見出し||!A||!B||!C||!>D-E\n||!1||A1||B1||^C1-C2||D1||E1\n||!2||A2||B2||^>D2-E2-D3-E3\n||!3||A3||B3||C3\n\n!! コメント\n\n\'//\'ではじまる行はコメントとして取りあつかい出力しません。\n\n!! 上記以外\n\n上記以外は普通の段落になります。\n\n空行を指定すると段落が変わります。\n連続した行はひとつの段落とみなします。この部分のソースを見てみてください。\n\n! テキスト書式\n\n!! Wiki Name\n\n次の条件に該当する単語はWikiNameになります。\n\n# 前後が空白または改行で区切られている。\n# 大文字の英字で始まり、小文字の英字または数字が続く。\n# 2.が二回以上繰りかえされる。\n\nWikiNameには該当ページへのリンクを自動的に設定します。存在しないページ名のWikiNameを記述して選択すると新規ページ作成を行います。たとえば次のWikiNameを選択すると\'NewPage\'というページ名の新規ページを作成します。\n\nNewPage\n\n!! 画像とWeb URL自動リンク\n\n次の条件に該当するURLはリンクまたは画像として処理します。\n\n# 前後が空白または改行で区切られている。\n# \'http://\'または\'https://\'ではじまる。\n\n画像の場合は指定URLの画像を表示します。それ以外はリンクを設定します。\n\n!!! 画像の例\n\nhttp://www.w3.org/html/logo/downloads/HTML5_Logo_128.png\n\n!!! リンクの例\n\nhttp://www.w3.org/html/planet/\n\n!! 任意リンク\n\n次の条件に該当するテキストはリンクとして処理します:\n\n* \'[[\'ではじまる。\n* \']]\'で終わる。\n* \'|\'の前に表記を、うしろにURLまたはWikiNameを記述する。\n\n[[Planet HTML5|http://www.w3.org/html/planet/]]\n\n!! 修飾\n\n* "\'"2個で囲んだ部分は\'\'強調\'\'します。\n* "\'"3個で囲んだ部分は\'\'\'より強調\'\'\'します。\n* \'=\'2個で囲んだ部分は==取り消し線==で修飾します。\n',
+			'content' : '「編集」ボタンを選択して編集してみてください。\n\n書式は「ヘルプ」の「書式」で確認できます。実際の出力はテキスト入力エディターの下で確認できます。\n「編集」を選択してソースのテキストと見比べてみてください。\n\nCliWikiは書式として次を選択できます:\n\n* CliWiki記法(ほぼ[[Hiki記法|http://hikiwiki.org/ja/?TextFormattingRules]]互換)\n* [[Markdown|http://daringfireball.net/projects/markdown/]]記法\n\n記法の指定は「設定」ページの「マークアップ」選択フィールドで可能です。編集ページでページごとの指定も可能です。\n\nMarkdown記法については次を参照してください:\n\n* [[Markdown Syntax Documentation|http://daringfireball.net/projects/markdown/syntax]](英語)\n* [[Markdown - ウィキペディア|http://ja.wikipedia.org/wiki/Markdown#.E8.A8.98.E6.B3.95.E3.81.AE.E4.BE.8B]](日本語)\n\nCliWiki記法について次で説明します。\n\n! 段落書式\n\n!! 見出し\n\n\'!\'ではじまる行は見出しになります。'
+				+ '\'!\'の数でレベルを指定します。\n\n!! 水平線\n\n\'----\'だけを記述すると次のような水平線になります。\n\n----\n\n!! リスト\n\n\'*\'ではじまる連続した行は順序なしのリストになります。\n\n'
+			+ '* 項目1\n** 項目1の1\n** 項目1の2\n* 項目2\n* 項目3\n\n\'#\'ではじまる連続した行は順序ありのリストになります。\n\n# 項目1\n# 項目2\n## 項目2の1\n## 項目2の2\n# 項目3\n\n'
+			+ '!! 用語解説\n\n\':\'ではじまり、'
+			+ '\':\'を挟んで用語と解説を記述した連続行は用語解説になります。'
+			+ '\n\n:用語の見出し1:用語1の解説\n:用語の見出し2:用語2の解説\n:用語の見出し3:用語4の解説\n\n\n'
+			+ '!! 整形済みテキスト\n\n空白(U+0020)またはタブではじまる行は整形済みテキストとみなします。\n\n'
+			+ ' 整形済みテキストは\n 改行がそのままのかたちで残ります。\n\n\'<<<\'だけを記述した行から'
+			+ '\'>>>\'だけを記述した行のあいだも整形済みテキストとみなします。\n\n'
+			+ '!! 表\n\n\'||\'ではじまる行は表のかたちに整形します。'
+			+ '\'||\'がセルの区切りになります。行末尾には\'||\'はいりません。\n\nセルの項目の頭に「!」をつけると見出しセルになります。行の連結には「^」を、列の連結には「>」を、連結したい数だけセルの項目頭につけてください。\n\n'
+			+ '!!! 記述例\n\n||!行 / 列見出し||!A||!B||!C||!>D-E\n||!1||A1||B1||^C1-C2||D1||E1\n||!2||A2||B2||^>D2-E2-D3-E3\n||!3||A3||B3||C3\n\n!! コメント\n\n\'//\'ではじまる行はコメントとして取りあつかい出力しません。\n\n!! 上記以外\n\n上記以外は普通の段落になります。\n\n空行を指定すると段落が変わります。\n連続した行はひとつの段落とみなします。この部分のソースを見てみてください。\n\n'
+				+ '! テキスト書式\n\n!! Wiki Name\n\n次の条件に該当する単語はWikiNameになります。\n\n# 前後が空白または改行で区切られている。\n# 大文字の英字で始まり、小文字の英字または数字が続く。\n# 2.が二回以上繰りかえされる。\n\nWikiNameには該当ページへのリンクを自動的に設定します。存在しないページ名のWikiNameを記述して選択すると新規ページ作成を行います。たとえば次のWikiNameを選択すると\'NewPage\'というページ名の新規ページを作成します。\n\nNewPage\n\n'
+				+ '!! 画像とWeb URL自動リンク\n\n次の条件に該当するURLはリンクまたは画像として処理します。\n\n# 前後が空白または改行で区切られている。\n# \'http://\'または\'https://\'ではじまる。\n\n画像の場合は指定URLの画像を表示します。それ以外はリンクを設定します。\n\n'
+				+ '!!! 画像の例\n\nhttp://www.w3.org/html/logo/downloads/HTML5_Logo_128.png\n\n!!! リンクの例\n\nhttp://www.w3.org/html/planet/\n\n!! 任意リンク\n\n次の条件に該当するテキストはリンクとして処理します:\n\n* \'[[\'ではじまる。\n* \']]\'で終わる。\n* \'|\'の前に表記を、うしろにURLまたはWikiNameを記述する。\n\n[[Planet HTML5|http://www.w3.org/html/planet/]]\n\n!! 修飾\n\n* "\'"2個で囲んだ部分は\'\'強調\'\'します。\n* "\'"3個で囲んだ部分は\'\'\'より強調\'\'\'します。\n* \'=\'2個で囲んだ部分は==取り消し線==で修飾します。\n'
+				,
 			'lastUpdateTime' : null
 		};
 

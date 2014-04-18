@@ -2,12 +2,12 @@
  * @fileOverview TextCatalogue class definition
  * http://cliwiki.codeplex.com/
  *
- * Copyright 2012-2013 EAST Co.,Ltd.
+ * Copyright 2012-2014 EAST Co.,Ltd.
  * Licensed under the MIT license.
  * http://cliwiki.codeplex.com/license
  *
  * @author Osada Jun(EAST Co.,Ltd. - http://www.est.co.jp/)
- * @version 0.5.1.1(20130925)
+ * @version 0.6.1.1(20140418)
  */
 
 //
@@ -36,7 +36,13 @@ function TextCatalogue(lang) {
 
 				'Keyword' : 'キーワード',
 				'Page name' : 'ページ名',
-				'Comparison...' : '比較...'
+				'Comparison...' : '比較...',
+				'Processing...' : '処理中...',
+				'Invalid data.' : '無効な形式です。',
+				'Imported.' : 'インポートしました。',
+				'Imported, but no change.' : 'インポートした結果、更新はありませんでした。',
+				'Cancel update' : '更新取消',
+				'Cancel latest update, OK?' : '最後の更新を取り消します。よろしいですか?'
 			};
 			break;
 	}

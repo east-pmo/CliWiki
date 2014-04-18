@@ -2,12 +2,12 @@
  * @fileOverview Preference class definition
  * http://cliwiki.codeplex.com/
  *
- * Copyright 2012-2013 EAST Co.,Ltd.
+ * Copyright 2012-2014 EAST Co.,Ltd.
  * Licensed under the MIT license.
  * http://cliwiki.codeplex.com/license
  *
  * @author Osada Jun(EAST Co.,Ltd. - http://www.est.co.jp/)
- * @version 0.5.1.1(20130925)
+ * @version 0.6.1.1(20140418)
  */
 
 //
@@ -45,7 +45,13 @@ var Preference = {
 		 * Allow file scheme flag.
 		 * @type {Object}
 		 */
-		_allowFileScheme: false
+		_allowFileScheme: false,
+
+		/**
+		 * Count of editor row line.
+		 * @type {Number}
+		 */
+		_editorRowLineCount: 20
 	},
 
 	//
@@ -58,7 +64,7 @@ var Preference = {
 	 * @return {String} Application version.
 	 */
 	getAppVersion: function() {
-		return 'CliWiki Ver.0.5.1.1(20130925)';
+		return 'CliWiki Ver.0.6.1.1(20140418)';
 	},
 
 	/**
@@ -123,6 +129,18 @@ var Preference = {
 	},
 
 	/**
+	 * Get editor row line count.
+	 *
+	 * @return {Number} Editor row line count.
+	 */
+	getEditorRowLineCount: function() {
+		if ((typeof Preference._values._editorRowLineCount) == 'undefined') {
+			Preference._values._editorRowLineCount = 20;
+		}
+		return Preference._values._editorRowLineCount;
+	},
+
+	/**
 	 * Set display language.
 	 *
 	 * @param {String} Display language.
@@ -145,10 +163,20 @@ var Preference = {
 	/**
 	 * Set allow file scheme.
 	 *
-	 * @param {Boolean} Allow file scheme flag.
+	 * @param {Boolean} flag Allow file scheme flag.
 	 */
 	setAllowFileScheme: function(flag) {
 		Preference._values._allowFileScheme = flag;
+		Preference._saveValues();
+	},
+
+	/**
+	 * Set display language.
+	 *
+	 * @param {Number} rowLineCount Count of editor row line.
+	 */
+	setEditorRowLineCount: function(rowLineCount) {
+		Preference._values._editorRowLineCount = rowLineCount;
 		Preference._saveValues();
 	},
 
@@ -161,9 +189,11 @@ var Preference = {
 	 */
 	_loadValues: function() {
 		if (Preference._initialized === false) {
-			var values = localStorage.getItem('CliWiki_Preference');
-			if (values !== null) {
-				Preference._values = JSON.parse(values);
+			if (Html5Feature.isLocalStorageAvailable()) {
+				var values = localStorage.getItem('CliWiki_Preference');
+				if (values !== null) {
+					Preference._values = JSON.parse(values);
+				}
 			}
 			Preference._initialized = true;
 		}

@@ -2,12 +2,12 @@
  * @fileOverview CliWiki application entry and class definitions
  * http://cliwiki.codeplex.com/
  *
- * Copyright 2012-2013 EAST Co.,Ltd.
+ * Copyright 2012-2014 EAST Co.,Ltd.
  * Licensed under the MIT license.
  * http://cliwiki.codeplex.com/license
  *
  * @author Osada Jun(EAST Co.,Ltd. - http://www.est.co.jp/)
- * @version 0.5.1.1(20130925)
+ * @version 0.6.1.1(20140418)
  */
 
 //
@@ -319,6 +319,7 @@ CliWikiApp.prototype = {
 		list.empty();
 		var archives = this._pageStocker.getPageContentArchives(pageName);
 		var revision = archives.length;
+		var catalogue = new TextCatalogue(Preference.getLanguage());
 		var instance = this;
 		jQuery.each(archives, function() {
 			var page = new Page(pageName,
@@ -327,19 +328,29 @@ CliWikiApp.prototype = {
 								this.lastUpdateTime,
 								this.markUpStyle);
 			var row = $('<tr></tr>');
-			row.append('<td class="pageRevision">' + revision + '</td>');
+			var revColumn = $('<td class="pageRevision"></td>');
+			revColumn.text(revision);
+			row.append(revColumn);
 
 			var heading = page.getLastUpdateTime() + ' / ' + page.getTitle();
 			if (revision === archives.length) {
-				row.append('<td><a href="#">' + heading + '</a></td>');
-				row.find('a').on('click', function() {
+				var column = $('<td><a href="#" class="selectPage"></a></td>');
+				column.find('a').on('click', function() {
 					instance.selectPage(pageName);
-				});
+				}).text(heading);
+				if (1 < revision) {
+					var cancel = $('<span> - [<a href="#" class="cancelUpdate"></a>]</span>');
+					cancel.find('a').on('click', function() {
+						instance.cancelLatestUpdateOf(pageName);
+					}).text(catalogue.getText('Cancel update'));
+					column.append(cancel);
+				}
+				row.append(column);
 			}
 			else {
-				row.append('<td><details><summary><span>'
-							+ heading
-							+ '</span></summary><div></div></details></td>');
+				var details = $('<td><details><summary><span></span></summary><div></div></details></td>');
+				details.find('span').text(heading);
+				row.append(details);
 				row.find('details summary').on('click', function() {
 					var content = $(this).nextAll('div');
 					if (content.text().length === 0) {
@@ -427,6 +438,16 @@ CliWikiApp.prototype = {
 			var changeStyle = selectStyle.children('option:selected').val();
 			Preference.setMarkUpStyle(changeStyle);
 		});
+
+		var rowLineCount = CliWikiUI.getEditorRowLineCountElement();
+		rowLineCount.val(Preference.getEditorRowLineCount());
+		rowLineCount.on('change', function() {
+			Preference.setEditorRowLineCount(rowLineCount.val());
+		});
+
+		CliWikiUI.setDownloadArchiveData(this._pageStocker.getSerializedData(),
+										 this._pageStocker.getLastUpdateTime());
+		CliWikiUI.initImportField();
 	},
 
     /**
@@ -488,6 +509,48 @@ CliWikiApp.prototype = {
 		tbody.find('a[href!=""]').each(function() {
 			instance._setPageAnchorClickEvent($(this));
 		});
+	},
+
+    /**
+     * Import page archive.
+     *
+     * @param {String} serializedArchive Serialized page archive data.
+     */
+	importPageArchive: function(serializedArchive) {
+		try {
+			var prevVer = this._pageStocker.getSerializedData();
+			
+			var asJson = JSON.parse(serializedArchive);
+			if (this._pageStocker.isValidData(asJson) === false) {
+				throw new Error('Invalid data.');
+			}
+
+			this._pageStocker.merge(asJson);
+
+			var updated = (prevVer !== this._pageStocker.getSerializedData());
+			CliWikiUI.alert(updated ? 'Imported.' : 'Imported, but no change.');
+			if (updated) {
+				this._updateContentList();
+			}
+		}
+		catch (e) {
+			CliWikiUI.alert('Invalid data.');
+		}
+		finally {
+			CliWikiUI.initImportField();
+		}
+	},
+
+	/** 
+	 * Cancel latest update of specfied page.
+	 *
+	 * @param {String} pageName Page name for cancel latest update.
+	 */
+	cancelLatestUpdateOf: function(pageName) {
+		if (CliWikiUI.confirm('Cancel latest update, OK?')) {
+			this._pageStocker.cancelLatestUpdateOf(pageName);
+			this.selectPage(pageName);
+		}
 	},
 
 	//

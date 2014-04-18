@@ -2,12 +2,12 @@
  * @fileOverview HTML5 features class definitions
  * http://cliwiki.codeplex.com/
  *
- * Copyright 2012 EAST Co.,Ltd.
+ * Copyright 2012,2014 EAST Co.,Ltd.
  * Licensed under the MIT license.
  * http://cliwiki.codeplex.com/license
  *
  * @author Osada Jun(EAST Co.,Ltd. - http://www.est.co.jp/)
- * @version 0.2.2.2(20120904)
+ * @version 0.6.1.1(20140418)
  */
 
 //
@@ -32,7 +32,7 @@ var Html5Feature = {
 	isLocalStorageAvailable: function() {
 		var available = false;
 		try {
-			available = localStorage !== undefined;
+			available = ((typeof localStorage) != 'undefined');
 		}
 		catch (e) {
 		}

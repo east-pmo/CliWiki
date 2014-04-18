@@ -3,6 +3,7 @@
 <html xmlns="http://www.w3.org/1999/xhtml" lang="ja" xml:lang="ja">
 <head>
 	<meta http-equiv="content-type" content="application/xhtml+xml" />
+	<meta charset="utf-8" />
 	<meta name="application-name" content="CliWiki" />
 	<title>CliWiki - Stand alone client Wiki</title>
 	<link rel="stylesheet" type="text/css" href="compatibility.css" />
@@ -79,7 +80,7 @@
 									</select>
 								</div>
 								<textarea id="sourceContent" rows="20"></textarea>
-								<hr />
+								<div id="separator"><strong> - <span lang="ja">プレビュー</span><span lang="en">Preview</span> - </strong></div>
 							</details>
 							<div id="presentation">
 								<h1 id="presentationTitle">FrontPage</h1>
@@ -237,16 +238,31 @@
 									<option value="ja">日本語</option>
 								</select>
 							</p>
+							<p id="allowFileSchemePreference">
+								<label><input type="checkbox" id="allowFileScheme" name="allowFileScheme" value="1" /><span lang="ja">ローカルファイルへのリンクを有効にする。</span><span lang="en">Allow local file link.</span></label>
+							</p>
+						</fieldset>
+
+						<fieldset>
+							<legend><span lang="ja">編集</span><span lang="en">Edit</span></legend>
+
 							<p>
-								<label for="markUpStyle"><span lang="ja">マークアップ</span><span lang="en">Mark up</span>:</label>
+								<label for="markUpStyle"><span lang="ja">既定のマークアップ</span><span lang="en">Default mark up</span>:</label>
 								<select id="markUpStyle">
 									<option value="cliwiki">CliWiki(like Hiki)</option>
 									<option value="markdown">Markdown</option>
 								</select>
 							</p>
-							<p id="allowFileSchemePreference">
-								<label><input type="checkbox" id="allowFileScheme" name="allowFileScheme" value="1" /><span lang="ja">ローカルファイルへのリンクを有効にする。</span><span lang="en">Allow local file link.</span></label>
+							<p>
+								<label for="edittorRowLineCount"><span lang="ja">本文編集エリア行数</span><span lang="en">Contents editor row line count</span>:</label>
+							<span lang="ja">小</span><span lang="en">Min</span><input id="edittorRowLineCount" type="range" min="5" max="99" step="1" /><span lang="ja">大</span><span lang="en">Max</span>
 							</p>
+						</fieldset>
+
+						<fieldset>
+							<legend><span lang="ja">ページデータ</span><span lang="en">Page data</span></legend>
+							<p><span lang="ja">エクスポート</span><span lang="en">Export</span>: <a id="exportAsFileLink" href="#"><span lang="ja">ファイルとしてエクスポート</span><span lang="en">Export as a file</span></a></p>
+							<p><span lang="ja">インポート</span><span lang="en">Import</span>: <input type="file" id="importFileData" /><span id="importMessage"></span></p>
 						</fieldset>
 					</form>
 				</section>
